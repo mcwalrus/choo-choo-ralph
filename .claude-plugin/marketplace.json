@@ -2,7 +2,7 @@
   "name": "mj-meyer/choo-choo-ralph",
   "owner": {
     "name": "MJ Meyer",
-    "email": "mj@mjmeyer.com"
+    "url": "https://mjmeyer.dev"
   },
   "metadata": {
     "description": "Autonomous coding using the Ralph Wiggum technique",
@@ -15,7 +15,8 @@
       "description": "Autonomous coding using the Ralph Wiggum technique - simple loops, persistent memory, one task at a time",
       "version": "1.0.0",
       "author": {
-        "name": "MJ Meyer"
+        "name": "MJ Meyer",
+        "url": "https://mjmeyer.dev"
       },
       "repository": "https://github.com/mj-meyer/choo-choo-ralph",
       "keywords": ["autonomous", "coding", "ralph", "beads", "workflow"]
