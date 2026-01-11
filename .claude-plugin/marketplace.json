@@ -11,7 +11,10 @@
   "plugins": [
     {
       "name": "choo-choo-ralph",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "mj-meyer/choo-choo-ralph"
+      },
       "description": "Autonomous coding using the Ralph Wiggum technique - simple loops, persistent memory, one task at a time",
       "version": "1.0.0",
       "author": {
