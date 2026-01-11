@@ -1,7 +1,7 @@
 # Choo Choo Ralph
 
 <p align="center">
-  <img src="choo-choo-ralph.png" alt="Choo Choo Ralph" width="600">
+  <img src="choo-choo-ralph.png" alt="Choo Choo Ralph" width="100%">
 </p>
 
 **Ship while you sleep. Wake up to commits.**
