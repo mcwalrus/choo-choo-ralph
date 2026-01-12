@@ -62,7 +62,26 @@ If no spec file provided or found:
 5. If user chooses "Create spec first": run `/choo-choo-ralph:spec` command
 6. If user chooses "Cancel": stop and report cancellation
 
+## Workflow Mode Selection
+
+After determining the source (spec file or conversation), ask the user how they want to pour the tasks using **AskUserQuestion**:
+
+```
+Question: "How would you like to pour these tasks?"
+Header: "Workflow"
+
+Options:
+- Use workflow formula (Recommended) - Multi-step workflow with structured phases like health checks, implementation, verification, and commit. Best for production features.
+- Create singular tasks - Simple beads executed directly. Good for exploratory work, research, prototyping, or one-off tasks.
+```
+
+**If "Use workflow formula"**: Proceed to Formula Selection below.
+
+**If "Create singular tasks"**: Skip Formula Selection entirely and go straight to task breakdown. Tasks will be created with `bd create` instead of `bd mol pour`.
+
 ## Formula Selection
+
+**Note:** This section only applies when "Use workflow formula" is chosen above.
 
 1. If `formula` provided, use that formula
 2. Otherwise, run `bd formula list`:
@@ -170,27 +189,45 @@ Spec task "User Authentication" with integration test steps might pour into:
 ## Process
 
 1. **Determine source**: Spec file or conversation
-2. **Select formula**: Use provided, auto-select, or prompt
-3. **Parse spec tasks**: Extract high-level tasks from source
-4. **Break down into implementation tasks** (CRITICAL):
+2. **Select workflow mode**: Ask user (see "Workflow Mode Selection" above):
+   - If "Use workflow formula": proceed to step 3
+   - If "Create singular tasks": skip to step 4 (no formula needed)
+3. **Select formula** (workflow formula mode only): Use provided, auto-select, or prompt (see "Formula Selection" above)
+4. **Parse spec tasks**: Extract high-level tasks from source
+5. **Break down into implementation tasks** (CRITICAL):
    - Each spec task → multiple granular implementation tasks
    - Target 5-10 implementation tasks per spec task
-   - Each implementation task = one molecule
+   - Each implementation task = one molecule (or singular task)
    - See "Task Granularity" section above for guidance
-5. **Read spec frontmatter variables**: Extract optional fields for formula variables:
+6. **Read spec frontmatter variables** (workflow formula mode only): Extract optional fields for formula variables:
    - `auto_discovery` (default: `false`) - Enable auto task creation from gaps
    - `auto_learnings` (default: `false`) - Enable auto skill creation from learnings
-6. **Generate test steps**: Create granular test steps for each implementation task (see Test Step Complexity above)
-7. **Confirm with user** (AskUserQuestion):
+7. **Generate test steps**: Create granular test steps for each implementation task (see Test Step Complexity above)
+8. **Confirm with user** (AskUserQuestion):
 
-   Present a summary and let user choose:
+   Present a summary and let user choose. The summary differs based on workflow mode:
 
+   **For workflow formula mode:**
    ```
    "Ready to pour tasks from spec."
 
    Spec tasks: 27
    Implementation tasks: ~135 (after breakdown)
    Formula: choo-choo-ralph (6 workflow steps each)
+
+   Options:
+   - Pour all tasks (Recommended) - Proceed with pouring
+   - Show task overview first - Review all tasks before pouring
+   - Cancel - Stop without pouring
+   ```
+
+   **For singular task mode:**
+   ```
+   "Ready to pour singular tasks from spec."
+
+   Spec tasks: 27
+   Implementation tasks: ~135 (after breakdown)
+   Mode: Singular tasks (direct execution, no workflow steps)
 
    Options:
    - Pour all tasks (Recommended) - Proceed with pouring
@@ -207,16 +244,16 @@ Spec task "User Authentication" with integration test steps might pour into:
 
    **If "Cancel":** Exit without pouring
 
-   **If "Pour all tasks":** Continue to step 8
+   **If "Pour all tasks":** Continue to step 9
 
-8. **Pour tasks using sub-agents** (for context preservation and speed):
+9. **Pour tasks using sub-agents** (for context preservation and speed):
 
    - Group implementation tasks into batches of 10-15 tasks
    - Launch 5-10 sub-agents in parallel, each handling one batch
    - Each sub-agent runs the pour commands for its batch
    - This keeps context lean and speeds up the pour process
 
-   Each sub-agent runs for its batch:
+   **For workflow formula mode**, each sub-agent runs:
 
    ```bash
    bd --no-daemon mol pour {{formula}} \
@@ -228,7 +265,7 @@ Spec task "User Authentication" with integration test steps might pour into:
      --assignee ralph
    ```
 
-   Notes:
+   Notes for formula mode:
 
    - Use `bd mol pour` (not `bd formula pour`)
    - Use `--var` for variables (not `--set`)
@@ -237,16 +274,60 @@ Spec task "User Authentication" with integration test steps might pour into:
    - The `auto_discovery` and `auto_learnings` variables come from spec frontmatter (default to `false`)
    - **Capture the root bead ID** from each `bd mol pour` output for the poured array
 
-9. **Set priority on each root bead**:
-   - After pouring, update each root bead with its priority from the spec task
-   - Run: `bd update <root-bead-id> --priority {{task.priority}}`
-   - Priority values: 0-4 (0=critical, 1=high, 2=medium, 3=low, 4=backlog)
-10. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
-11. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
+   **For singular task mode**, each sub-agent runs:
+
+   ```bash
+   bd --no-daemon create "{{task.title}}" \
+     --description "{{task.description_with_template}}" \
+     --assignee ralph \
+     --labels "{{task.category}}"
+   ```
+
+   Notes for singular task mode:
+
+   - Use `bd create` (not `bd mol pour`)
+   - The description should use the **Singular Task Description Template** (see below)
+   - **Capture the bead ID** from output for the poured array
+
+   ### Singular Task Description Template
+
+   For singular tasks, wrap the task description with execution instructions:
+
+   ```markdown
+   ## Task
+   {{task.description}}
+
+   ## Test Steps
+   {{task.test_steps}}
+
+   ## Execution
+   Execute this task directly. When complete:
+   1. Add a summary comment: `bd comments add <your-id> "[summary] <what was done>"`
+   2. Close the bead: `bd close <your-id>`
+
+   ## Capturing Gaps
+   If you discover missing work that's clearly needed:
+   ```bash
+   bd comments add <your-id> "[GAP] <title> - <description>"
+   ```
+
+   ## Capturing Learnings
+   If you encounter something noteworthy:
+   ```bash
+   bd comments add <your-id> "[LEARNING] <description>"
+   ```
+   ```
+
+10. **Set priority on each root bead**:
+    - After pouring, update each bead with its priority from the spec task
+    - Run: `bd update <bead-id> --priority {{task.priority}}`
+    - Priority values: 0-4 (0=critical, 1=high, 2=medium, 3=low, 4=backlog)
+11. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created bead IDs (see below)
+12. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
 
 ## Error Recovery
 
-If `bd mol pour` fails mid-way through multiple tasks:
+If `bd mol pour` or `bd create` fails mid-way through multiple tasks:
 
 1. **Identify failed task**: Note which task failed and the error message
 2. **Rollback partial state**: Delete any orphaned beads created for the failed task: `bd delete <partial-bead-id>`
@@ -258,9 +339,9 @@ If `bd mol pour` fails mid-way through multiple tasks:
 
 ## Updating Spec Frontmatter
 
-After all tasks are poured successfully, update the spec's YAML frontmatter with the root bead IDs:
+After all tasks are poured successfully, update the spec's YAML frontmatter with the bead IDs:
 
-1. **Collect root bead IDs** from each `bd mol pour` command output
+1. **Collect bead IDs** from each `bd mol pour` or `bd create` command output
 2. **Update the `poured` array** in the frontmatter with all collected IDs
 
 **Example before pour:**
@@ -280,9 +361,9 @@ poured: []
 title: "User Authentication"
 created: 2026-01-11
 poured:
-  - proj-mol-abc
-  - proj-mol-def
-  - proj-mol-ghi
+  - proj-abc
+  - proj-def
+  - proj-ghi
 ---
 ```
 
@@ -337,9 +418,17 @@ Options:
 
 ## Output
 
-Summary:
+Summary differs based on workflow mode:
+
+**For workflow formula mode:**
 
 - N tasks poured using {{formula}} formula
 - Root bead IDs for each
 - Total beads created (tasks × formula steps)
+- Command to start: `./ralph.sh`
+
+**For singular task mode:**
+
+- N singular tasks created
+- Bead IDs for each
 - Command to start: `./ralph.sh`
