@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Autonomous coding using the Ralph Wiggum technique",
-    "version": "0.1.4"
+    "version": "0.1.5"
   },
   "plugins": [
     {
@@ -16,7 +16,7 @@
         "repo": "mj-meyer/choo-choo-ralph"
       },
       "description": "Autonomous coding using the Ralph Wiggum technique - simple loops, persistent memory, one task at a time",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "author": {
         "name": "MJ Meyer",
         "url": "https://mjmeyer.dev"

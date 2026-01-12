@@ -167,7 +167,33 @@ Spec task "User Authentication" with integration test steps might pour into:
    - `auto_discovery` (default: `false`) - Enable auto task creation from gaps
    - `auto_learnings` (default: `false`) - Enable auto skill creation from learnings
 6. **Generate test steps**: Create granular test steps for each implementation task (see Test Step Complexity above)
-7. **Pour tasks using sub-agents** (for context preservation and speed):
+7. **Confirm with user** (AskUserQuestion):
+
+   Present a summary and let user choose:
+   ```
+   "Ready to pour tasks from spec."
+
+   Spec tasks: 27
+   Implementation tasks: ~135 (after breakdown)
+   Formula: choo-choo-ralph (6 workflow steps each)
+
+   Options:
+   - Pour all tasks (Recommended) - Proceed with pouring
+   - Show task overview first - Review all tasks before pouring
+   - Cancel - Stop without pouring
+   ```
+
+   **If "Show task overview first":**
+   - Save full breakdown to `.choo-choo-ralph/pour-preview.md`
+   - Include: task title, description snippet, category, priority, test step count
+   - Tell user: "Overview saved to .choo-choo-ralph/pour-preview.md - review and run /pour again when ready"
+   - Exit without pouring
+
+   **If "Cancel":** Exit without pouring
+
+   **If "Pour all tasks":** Continue to step 8
+
+8. **Pour tasks using sub-agents** (for context preservation and speed):
    - Group implementation tasks into batches of 10-15 tasks
    - Launch 5-10 sub-agents in parallel, each handling one batch
    - Each sub-agent runs the pour commands for its batch
@@ -190,12 +216,12 @@ Spec task "User Authentication" with integration test steps might pour into:
    - The `category` variable comes from the spec task's category attribute
    - The `auto_discovery` and `auto_learnings` variables come from spec frontmatter (default to `false`)
    - **Capture the root bead ID** from each `bd mol pour` output for the poured array
-8. **Set priority on each root bead**:
+9. **Set priority on each root bead**:
    - After pouring, update each root bead with its priority from the spec task
    - Run: `bd update <root-bead-id> --priority {{task.priority}}`
    - Priority values: 0-4 (0=critical, 1=high, 2=medium, 3=low, 4=backlog)
-9. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
-10. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
+10. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
+11. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
 
 ## Error Recovery
 
