@@ -1,6 +1,6 @@
 ---
 name: Ralph Guide
-description: This skill should be used when the user asks "how do I customize Ralph", "how do I create a formula", "how do I run multiple Ralphs", "how does the Ralph loop work", "how do I monitor Ralph progress", "what if Ralph fails", "how do I harvest learnings", "how does learning capture work", "how do I extract patterns from completed tasks", or needs guidance on customizing the Choo Choo Ralph workflow, formulas, or learning system.
+description: Guidance for customizing Ralph workflows, formulas, learning capture, and troubleshooting. Use for questions about Ralph loop, formulas, harvesting learnings, or running multiple Ralphs.
 ---
 
 # Ralph Guide
