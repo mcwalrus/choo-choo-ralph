@@ -1,6 +1,6 @@
 ---
 description: Harvest learnings and gaps from completed Choo Choo Ralph tasks into docs, skills, or CLAUDE.md
-argument-hint: [harvest-plan?]
+argument-hint: [harvest-plan]
 ---
 
 # Harvest Learnings and Gaps

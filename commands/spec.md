@@ -1,6 +1,6 @@
 ---
 description: Generate or refine a spec file for Choo Choo Ralph from your plan
-argument-hint: [spec-name?] [source-file?]
+argument-hint: [spec-name] [source-file]
 ---
 
 # Generate or Refine Spec
