@@ -1,20 +1,28 @@
 ---
 description: Create Ralph beads from ready tasks in a spec file or conversation context
-argument-hint: [spec-name] [formula] [target-tasks]
+argument-hint: [target-tasks] [spec-file] [formula] 
 ---
 
 # Pour into Beads
+
+## Arguments
+
+<arguments>
+  target_tasks = $1  <!-- Optional: target number of implementation tasks -->
+  spec_file = $2     <!-- Optional: spec file name or path to pour from --> 
+  formula = $3       <!-- Optional: formula name to use (default: auto-detect) -->
+</arguments>
 
 Create beads from ready tasks in a spec file, or directly from conversation context.
 
 ## Spec File Resolution
 
-When `{{spec-file}}` is provided:
+When `spec_name` is provided:
 
 - If it's a path (contains `/` or ends in `.md`): use directly
-- If it's just a name: look for `.choo-choo-ralph/{{spec-file}}.spec.md`
+- If it's just a name: look for `.choo-choo-ralph/{spec_name}.spec.md`
 
-When `{{spec-file}}` is NOT provided:
+When `spec_name` is NOT provided:
 
 1. **Check for existing specs** in `.choo-choo-ralph/*.spec.md`
 2. **If exactly one spec exists**: Use that spec automatically
@@ -38,6 +46,7 @@ If no spec file provided or found:
 
 1. Extract tasks from conversation context
 2. **STOP and use AskUserQuestion** - Do NOT proceed without user confirmation:
+
    ```
    Question: "No spec file found. How would you like to proceed with these tasks?"
    [List extracted tasks]
@@ -47,6 +56,7 @@ If no spec file provided or found:
    - Create spec first (Recommended) - Run /spec for reviewable task breakdown
    - Cancel - Stop without creating anything
    ```
+
 3. **Wait for user response** before taking any action
 4. If user chooses "Pour directly": create molecules from extracted tasks
 5. If user chooses "Create spec first": run `/choo-choo-ralph:spec` command
@@ -54,7 +64,7 @@ If no spec file provided or found:
 
 ## Formula Selection
 
-1. If `{{formula}}` provided, use that formula
+1. If `formula` provided, use that formula
 2. Otherwise, run `bd formula list`:
    - If only one formula exists, use it automatically
    - If multiple formulas exist, ask user to choose
@@ -70,6 +80,7 @@ If no spec file provided or found:
 3. **Formula steps** = Workflow phases within each task (bearings, implement, verify, commit) - these are NOT counted toward task granularity
 
 **Example:**
+
 - Spec has 10 high-level tasks
 - Each spec task breaks down into 5-10 implementation tasks
 - Target: 50-100 implementation tasks (molecules)
@@ -77,7 +88,7 @@ If no spec file provided or found:
 
 ### Target Implementation Tasks
 
-If `{{target-tasks}}` is provided (e.g., 80):
+If `target_tasks` is provided (e.g., 80):
 
 - This is the target number of **implementation tasks (molecules)**, NOT spec tasks
 - Break down spec tasks to reach this target
@@ -85,13 +96,13 @@ If `{{target-tasks}}` is provided (e.g., 80):
 
 ### Default Targets (Guidance)
 
-If `{{target-tasks}}` is NOT provided, use these defaults:
+If `target_tasks` is NOT provided, use these defaults:
 
-| Project Type     | Target Molecules | Breakdown Ratio        |
-| ---------------- | ---------------- | ---------------------- |
-| Single feature   | 15-30 tasks      | ~5-10 per spec task    |
-| Feature set      | 50-100 tasks     | ~5-8 per spec task     |
-| Full application | 150-300 tasks    | ~5-10 per spec task    |
+| Project Type     | Target Molecules | Breakdown Ratio     |
+| ---------------- | ---------------- | ------------------- |
+| Single feature   | 15-30 tasks      | ~5-10 per spec task |
+| Feature set      | 50-100 tasks     | ~5-8 per spec task  |
+| Full application | 150-300 tasks    | ~5-10 per spec task |
 
 ### What Makes a Good Implementation Task
 
@@ -103,16 +114,19 @@ Each implementation task (molecule) should be a **coherent slice of work**:
 - **Reasonable scope**: Not so big it's hard to review, not so small it's wasteful
 
 **TOO GRANULAR (bad):**
+
 - "Install package X" then "Install package Y" then "Install package Z" as separate tasks
 - "Update users.ts" then "Update users.test.ts" then "Update users.types.ts" as separate tasks
 - Breaking apart changes that only make sense together
 
 **TOO COARSE (bad):**
+
 - "Build entire authentication system" (frontend + backend + infrastructure + tests all in one)
 - Combining unrelated features into one task
 - Tasks that would take hours to review
 
 **JUST RIGHT:**
+
 - "Add login form with validation" - includes component, styles, validation logic, tested together
 - "Implement login API endpoint" - includes route, controller, validation, tests for that endpoint
 - "Add password reset flow" - frontend + backend for this specific slice, can be tested end-to-end
@@ -130,11 +144,11 @@ When pouring spec tasks into beads, **generate granular test steps** for each be
 
 Use a **mix of test step complexity** based on the task:
 
-| Task Type | Test Steps | Examples |
-|-----------|------------|----------|
-| Simple/focused | 2-5 steps | Button styling, color theme, simple validation |
-| Standard feature | 5-8 steps | Form component, API endpoint, data display |
-| Complex workflow | 10+ steps | Multi-step flows, auth flows, payment processing |
+| Task Type        | Test Steps | Examples                                         |
+| ---------------- | ---------- | ------------------------------------------------ |
+| Simple/focused   | 2-5 steps  | Button styling, color theme, simple validation   |
+| Standard feature | 5-8 steps  | Form component, API endpoint, data display       |
+| Complex workflow | 10+ steps  | Multi-step flows, auth flows, payment processing |
 
 **Guideline**: At least 20% of tasks should have 10+ test steps (the complex ones need thorough verification).
 
@@ -170,6 +184,7 @@ Spec task "User Authentication" with integration test steps might pour into:
 7. **Confirm with user** (AskUserQuestion):
 
    Present a summary and let user choose:
+
    ```
    "Ready to pour tasks from spec."
 
@@ -184,6 +199,7 @@ Spec task "User Authentication" with integration test steps might pour into:
    ```
 
    **If "Show task overview first":**
+
    - Save full breakdown to `.choo-choo-ralph/pour-preview.md`
    - Include: task title, description snippet, category, priority, test step count
    - Tell user: "Overview saved to .choo-choo-ralph/pour-preview.md - review and run /pour again when ready"
@@ -194,12 +210,14 @@ Spec task "User Authentication" with integration test steps might pour into:
    **If "Pour all tasks":** Continue to step 8
 
 8. **Pour tasks using sub-agents** (for context preservation and speed):
+
    - Group implementation tasks into batches of 10-15 tasks
    - Launch 5-10 sub-agents in parallel, each handling one batch
    - Each sub-agent runs the pour commands for its batch
    - This keeps context lean and speeds up the pour process
 
    Each sub-agent runs for its batch:
+
    ```bash
    bd --no-daemon mol pour {{formula}} \
      --var title="{{task.title}}" \
@@ -209,13 +227,16 @@ Spec task "User Authentication" with integration test steps might pour into:
      --var auto_learnings="{{spec.auto_learnings | default: 'false'}}" \
      --assignee ralph
    ```
+
    Notes:
+
    - Use `bd mol pour` (not `bd formula pour`)
    - Use `--var` for variables (not `--set`)
    - The `task` variable should include the generated test steps appended to the description
    - The `category` variable comes from the spec task's category attribute
    - The `auto_discovery` and `auto_learnings` variables come from spec frontmatter (default to `false`)
    - **Capture the root bead ID** from each `bd mol pour` output for the poured array
+
 9. **Set priority on each root bead**:
    - After pouring, update each root bead with its priority from the spec task
    - Run: `bd update <root-bead-id> --priority {{task.priority}}`
@@ -243,6 +264,7 @@ After all tasks are poured successfully, update the spec's YAML frontmatter with
 2. **Update the `poured` array** in the frontmatter with all collected IDs
 
 **Example before pour:**
+
 ```yaml
 ---
 title: "User Authentication"
@@ -252,6 +274,7 @@ poured: []
 ```
 
 **Example after pour:**
+
 ```yaml
 ---
 title: "User Authentication"

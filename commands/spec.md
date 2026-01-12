@@ -1,9 +1,16 @@
 ---
 description: Generate or refine a spec file for Choo Choo Ralph from your plan
-argument-hint: [spec-name] [source-file]
+argument-hint: [source-file] [spec-name]
 ---
 
 # Generate or Refine Spec
+
+## Arguments
+
+<arguments>
+source_file = $1  <!-- Optional: path to plan file or conversation context -->
+spec_name = $2    <!-- Optional: name of the spec (e.g., "user-auth") -->
+</arguments>
 
 This command has smart behavior based on the current state:
 
@@ -11,13 +18,13 @@ This command has smart behavior based on the current state:
 
 Specs are stored as `.choo-choo-ralph/<name>.spec.md`. Each project can have multiple specs.
 
-### When `{{name}}` is provided:
+### When `spec_name` is provided:
 
-- Use that name directly: `.choo-choo-ralph/{{name}}.spec.md`
+- Use that name directly: `.choo-choo-ralph/{spec_name}.spec.md`
 - If file exists, enter refinement mode (Mode 2 or 3)
 - If file doesn't exist, create new spec (Mode 1)
 
-### When `{{name}}` is NOT provided:
+### When `spec_name` is NOT provided:
 
 1. **Check for existing specs** in `.choo-choo-ralph/*.spec.md`
 2. **If exactly one spec exists**: Use that spec (refinement mode)
@@ -66,11 +73,11 @@ Both sub-agents should return concise summaries (not full docs) that inform spec
 
 With context gathered:
 
-- Accept plan from conversation context or file path ({{source}})
+- Accept plan from conversation context or file path (`source_file`)
 - Invoke the `/choo-choo-ralph:spec-generation` skill for format guidance (includes `<context>` section format)
 - **Get current date** by running `date +%Y-%m-%d` bash command for the frontmatter `created` field
 - **Include research findings** in the spec's `<context>` section
-- Generate at `.choo-choo-ralph/<name>.spec.md`
+- Generate at `.choo-choo-ralph/{spec_name}.spec.md`
 
 The spec-generation skill defines the full format including the `<context>` section structure for existing_patterns, integration_points, new_technologies, and conventions.
 
