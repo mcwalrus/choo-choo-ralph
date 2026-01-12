@@ -67,6 +67,26 @@ auto_learnings: false
     Context and goals.
   </overview>
 
+  <!-- Context from codebase/tech research (populated by /spec command) -->
+  <context>
+    <existing_patterns>
+      - Patterns found in the existing codebase to follow
+      - e.g., "Authentication follows pattern in src/auth/"
+    </existing_patterns>
+    <integration_points>
+      - Files/services this feature will integrate with
+      - e.g., "Extends UserService in src/services/user.ts"
+    </integration_points>
+    <new_technologies>
+      - Research notes for technologies not in codebase
+      - e.g., "Stripe: Use stripe-node SDK, webhook verification required"
+    </new_technologies>
+    <conventions>
+      - Coding conventions discovered in codebase
+      - e.g., "Tests colocated with source files (*.test.ts)"
+    </conventions>
+  </context>
+
   <!-- Optional: For greenfield projects -->
 
 <technology_stack>
@@ -227,6 +247,21 @@ When `--target-tasks` is specified:
 - Each task should be independently verifiable
 - Tasks can have dependencies (expressed via order or explicit deps)
 - Better to have more granular tasks than fewer large ones
+
+## Context Section
+
+The `<context>` section is populated by the `/spec` command using sub-agents that research the codebase and technologies before generating the spec. This ensures tasks are informed by the actual codebase.
+
+| Section | Purpose | Example |
+|---------|---------|---------|
+| `existing_patterns` | Code patterns to follow | "Components use shadcn/ui conventions" |
+| `integration_points` | Files/services to integrate with | "Extends UserService in src/services/user.ts" |
+| `new_technologies` | Research notes for new tech | "Stripe: Use webhook verification for security" |
+| `conventions` | Naming, testing, style conventions | "Tests colocated with source (*.test.ts)" |
+
+**For greenfield projects**: Context section may be minimal or empty, but should still include technology research if using unfamiliar tech.
+
+**For existing codebases**: Context section should be thorough - tasks reference patterns and integration points to ensure consistency.
 
 ## Additional Resources
 
