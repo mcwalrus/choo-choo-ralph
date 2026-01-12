@@ -95,15 +95,29 @@ If `{{target-tasks}}` is NOT provided, use these defaults:
 
 ### What Makes a Good Implementation Task
 
-Each implementation task (molecule) should be:
+Each implementation task (molecule) should be a **coherent slice of work**:
 
-- **Atomic**: One focused change (e.g., "Add login form component", not "Build authentication")
-- **Independently verifiable**: Can be tested in isolation
-- **Small commit**: Results in a single, focused commit
-- **30-60 minutes of work**: If it takes longer, break it down further
+- **Cohesive**: All changes belong together logically (e.g., frontend + backend for one feature slice is fine)
+- **Testable together**: Can be verified as a unit - the changes make sense to test together
+- **Complete slice**: Delivers a piece of functionality, not just a layer or file change
+- **Reasonable scope**: Not so big it's hard to review, not so small it's wasteful
 
-**WRONG:** "User Authentication" as one molecule
-**RIGHT:** Break into: "Create login form", "Add form validation", "Implement auth API", "Add session storage", "Create logout flow", etc.
+**TOO GRANULAR (bad):**
+- "Install package X" then "Install package Y" then "Install package Z" as separate tasks
+- "Update users.ts" then "Update users.test.ts" then "Update users.types.ts" as separate tasks
+- Breaking apart changes that only make sense together
+
+**TOO COARSE (bad):**
+- "Build entire authentication system" (frontend + backend + infrastructure + tests all in one)
+- Combining unrelated features into one task
+- Tasks that would take hours to review
+
+**JUST RIGHT:**
+- "Add login form with validation" - includes component, styles, validation logic, tested together
+- "Implement login API endpoint" - includes route, controller, validation, tests for that endpoint
+- "Add password reset flow" - frontend + backend for this specific slice, can be tested end-to-end
+
+**Key question:** Can this slice be implemented, committed, and tested as one coherent unit? If yes, it's the right size.
 
 ## Test Step Generation
 
