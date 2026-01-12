@@ -1,7 +1,6 @@
 ---
 name: Spec Generation
 description: This skill should be used when the /choo-choo-ralph:spec command runs, when generating a spec file for Choo Choo Ralph, when creating task breakdowns for Ralph, or when the user asks to "create a spec", "generate spec", "break down this project", or "structure these features into tasks".
-version: 1.0.0
 ---
 
 # Spec Generation
