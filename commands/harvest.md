@@ -1,9 +1,6 @@
 ---
 description: Harvest learnings and gaps from completed Choo Choo Ralph tasks into docs, skills, or CLAUDE.md
-arguments:
-  - name: plan
-    description: Path to existing harvest plan to refine (default: .choo-choo-ralph/harvest-plan.md)
-    required: false
+argument-hint: [harvest-plan?]
 ---
 
 # Harvest Learnings and Gaps

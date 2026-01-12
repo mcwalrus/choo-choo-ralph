@@ -1,12 +1,6 @@
 ---
 description: Generate or refine a spec file for Choo Choo Ralph from your plan
-arguments:
-  - name: name
-    description: Name for the spec file (without .md extension). If not provided, a name will be suggested.
-    required: false
-  - name: source
-    description: Optional file path containing the plan (otherwise uses conversation context)
-    required: false
+argument-hint: [spec-name?] [source-file?]
 ---
 
 # Generate or Refine Spec

@@ -1,15 +1,6 @@
 ---
 description: Create Ralph beads from ready tasks in a spec file or conversation context
-arguments:
-  - name: spec-file
-    description: Path to spec file or spec name. If name provided, looks for .choo-choo-ralph/<name>.spec.md
-    required: false
-  - name: formula
-    description: Formula to use (default: choo-choo-ralph). Run 'bd formula list' to see options.
-    required: false
-  - name: target-tasks
-    description: Approximate number of top-level tasks to create (guides granularity)
-    required: false
+argument-hint: [spec-name?] [formula?] [target-tasks?]
 ---
 
 # Pour into Beads
