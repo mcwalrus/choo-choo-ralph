@@ -43,10 +43,68 @@ Specs are stored as `.choo-choo-ralph/<name>.spec.md`. Each project can have mul
 
 When the target spec file doesn't exist:
 
+### Step 1: Gather Context (Parallel Sub-Agents)
+
+Launch sub-agents in parallel to gather context before generating the spec. This keeps main context lean and speeds up research.
+
+**Sub-Agent 1: Codebase Exploration**
+- Explore existing project structure and architecture
+- Identify patterns, conventions, and coding standards
+- Find relevant existing code the new feature will integrate with
+- Note file organization, naming conventions, test patterns
+- Identify existing utilities, components, or services to reuse
+
+**Sub-Agent 2: Technology Research** (if plan mentions unfamiliar tech)
+- Research documentation for technologies not already in the codebase
+- Fetch best practices, common patterns, gotchas
+- Look for integration examples with existing stack
+- Note any setup/configuration requirements
+
+Both sub-agents should return concise summaries (not full docs) that inform spec generation.
+
+### Step 2: Generate Spec
+
+With context gathered:
+
 - Accept plan from conversation context or file path ({{source}})
 - Invoke `/choo-choo-ralph:spec-generation` skill for format guidance
 - **Get current date** by running `date +%Y-%m-%d` bash command for the frontmatter `created` field
+- **Include codebase context** in the spec (see Context Section below)
 - Generate at `.choo-choo-ralph/<name>.spec.md`
+
+### Context Section in Spec
+
+The generated spec should include a `<context>` section with research findings:
+
+```xml
+<context>
+  <existing_patterns>
+    - Authentication follows pattern in src/auth/
+    - Components use shadcn/ui conventions
+    - API routes in src/app/api/ use route handlers
+  </existing_patterns>
+  <integration_points>
+    - Will extend existing UserService in src/services/user.ts
+    - Uses existing database schema in prisma/schema.prisma
+    - Integrates with existing middleware in src/middleware.ts
+  </integration_points>
+  <new_technologies>
+    - Stripe: Use stripe-node SDK, webhook verification required
+    - Research note: Use Stripe Elements for PCI compliance
+  </new_technologies>
+  <conventions>
+    - File naming: kebab-case for files, PascalCase for components
+    - Tests colocated with source files (*.test.ts)
+    - Use zod for validation schemas
+  </conventions>
+</context>
+```
+
+This context helps:
+- Tasks reference existing patterns to follow
+- Integration points are explicit
+- New tech has research notes attached
+- Conventions are documented for consistency
 
 ## Mode 2: Refine Based on Comments (Review Loop)
 
