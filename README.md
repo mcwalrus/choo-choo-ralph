@@ -16,27 +16,41 @@
   <a href="#further-reading">Further Reading</a>
 </p>
 
-**Ship while you sleep. Wake up to commits.**
+*Relentless like a train. Persistent like Ralph Wiggum. Ships code while you sleep.*
 
-> [!WARNING]
-> Ralph runs Claude with `--dangerously-skip-permissions`, which allows it to execute commands without confirmation. This is powerful but risky.
->
-> **We strongly recommend:**
-> - Run in a **Docker container** or **VM**
-> - Use a machine that doesn't have your life's work on it
-> - Start with small, low-risk tasks until you trust the setup
-> - Review the formulas and scripts before running
->
-> By using this project, you accept full responsibility for any consequences.
+---
 
-The dumbest smart way to build apps autonomously - run Claude in a loop with structured workflows and built-in verification. Like Ralph Wiggum: perpetually confused, always making mistakes, but never stopping until it's done.
+## The Idea
+
+Most autonomous coding setups fall into two traps:
+
+1. **Too simple** - Run Claude in a loop, hope for the best, watch it spiral when something breaks
+2. **Too complex** - Build elaborate orchestration that's harder to debug than the code it writes
+
+Choo Choo Ralph is neither. The outer loop is dead simple. The workflow inside each task is structured and verified. Each task remembers its own history across sessions.
+
+**The thesis**: Simple loop + smart workflow + persistent memory = autonomous coding that actually works.
+
+### What We Don't Do
+
+Planning. Your planning process is yours - downloading repos, grepping through code, iterating with different AI agents, writing markdown docs that evolve through discussion. That's creative, messy work that can't be captured in a command.
+
+### What We Do
+
+Take your plan - however rough or polished - and turn it into something an autonomous agent can execute reliably:
+
+1. **Spec** - Structure your plan into reviewable tasks with test steps
+2. **Pour** - Break those into granular, atomic units of work
+3. **Run** - Execute them one by one with verification
+4. **Learn** - Capture what the agents discover along the way
 
 ## What You Get
 
-- **Autonomous coding with verification** - Health checks, tests, and browser automation close the feedback loop
-- **Persistent memory per task** - Each task tracks its own history, pick up exactly where you left off
-- **Structured workflows** - Bearings → Implement → Verify → Commit (not just "do the thing")
-- **Simple outer loop, smart inner workflow** - Ralph's simplicity meets Anthropic's rigor
+- **Verified, not vibes** - Health checks before implementing, tests and browser verification after
+- **Bounded context** - Each task tracks its own history via [Beads](https://github.com/steveyegge/beads), no context window bloat
+- **Structured phases** - Bearings → Implement → Verify → Commit (not just "do the thing")
+- **Compounding knowledge** - Agents capture learnings as they work; [harvest](#compounding-knowledge) them into skills and docs that make future sessions smarter
+- **Pick up where you left off** - Tasks persist across sessions, crashes, and context resets
 
 ## The Workflow
 
@@ -47,16 +61,22 @@ The dumbest smart way to build apps autonomously - run Claude in a loop with str
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
 ```
 
-1. **Plan** - Write what you want to build (any format)
+1. **Plan** - Write what you want to build *(this is on you - we don't do planning)*
 2. **Spec** - AI transforms it into structured tasks; you review and refine
-3. **Pour** - Tasks become beads with workflows (5 beads per task)
+3. **Pour** - Tasks become beads ([workflow](#workflow-formula-recommended) or [singular](#singular-tasks))
 4. **Ralph** - The loop runs autonomously until done
 5. **Harvest** - Extract learnings into skills, docs, or CLAUDE.md
+
+## Why "Choo Choo Ralph"?
+
+**Choo Choo** - Like a train with carts. Each cart is a containerized block of work - self-contained, carrying its own context and history. The train keeps moving forward, cart after cart, toward your destination.
+
+**Ralph** - Named after the [Ralph Wiggum technique](https://ghuntley.com/ralph/): run an AI in a loop until it's done. Simple, relentless, surprisingly effective. Ralph makes mistakes, gets confused, but never stops trying.
 
 ## Prerequisites
 
 - [Claude Code](https://claude.com/claude-code) - Anthropic's CLI
-- [Beads](https://github.com/beads-project/beads) - Git-backed issue tracker (`bd` command)
+- [Beads](https://github.com/steveyegge/beads) - Git-backed issue tracker (`bd` command)
 - [jq](https://jqlang.github.io/jq/) - JSON parsing
 
 **Recommended:**
@@ -66,10 +86,25 @@ The dumbest smart way to build apps autonomously - run Claude in a loop with str
 
 ## Quick Start
 
+<details>
+<summary>⚠️ <strong>Safety Warning</strong> - Read before running</summary>
+
+Ralph runs Claude with `--dangerously-skip-permissions`, which allows it to execute commands without confirmation. This is powerful but risky.
+
+**We strongly recommend:**
+- Run in a **Docker container** or **VM**
+- Use a machine that doesn't have your life's work on it
+- Start with small, low-risk tasks until you trust the setup
+- Review the formulas and scripts before running
+
+By using this project, you accept full responsibility for any consequences.
+
+</details>
+
 ```bash
 # Install plugin
 /plugin marketplace add mj-meyer/choo-choo-ralph
-/plugin install choo-choo-ralph@mj-meyer/choo-choo-ralph
+/plugin install choo-choo-ralph@choo-choo-ralph
 
 # Set up project
 /choo-choo-ralph:install
@@ -124,7 +159,19 @@ Ralph includes a formatted output display so you can watch what's happening:
 
 Verbose mode is great for understanding how Ralph works and improving your prompts/formulas.
 
-Not ready to go fully autonomous? Use `./ralph-once.sh` to run one iteration at a time interactively.
+### Test Before You Sleep
+
+Not ready to go fully autonomous? Use `./ralph-once.sh` to run a single iteration interactively:
+
+```bash
+./ralph-once.sh  # Run one iteration, then stop
+```
+
+This is the best way to:
+- **Test your setup** before letting Ralph run overnight
+- **Optimize prompts** - see exactly what the agents do and refine the formulas
+- **Debug issues** - step through one task at a time
+- **Build trust** - watch Ralph complete a few tasks before going hands-off
 
 ## How It Works
 
@@ -173,16 +220,15 @@ Agents must verify their work. The bearings step runs health checks before imple
 
 Agents capture learnings as they work, building a knowledge base attached to completed tasks:
 
-- **Sub-agents comment on the root bead** when they encounter gotchas, patterns, or errors
-- **Orchestrator synthesizes** at completion, recommending skills or CLAUDE.md updates
-- **You review later** and decide what to extract
+- **Sub-agents add comments** on the root bead when they encounter gotchas, patterns, or missing work
+- **Comments use tags** - `[LEARNING]` for knowledge, `[GAP]` for follow-up work
+- **You harvest later** and decide what to extract into skills or docs
 
-Example learnings from a completed task:
+Example comments from a completed task:
 ```
-[bearings] This codebase uses barrel exports - always import from index.ts
-[implement] shadcn Button requires forwardRef when wrapping
-[verify] Tests require VITE_API_URL env var or they silently skip
-[summary] Recommendation: Consider skill for shadcn component patterns
+[LEARNING] This codebase uses barrel exports - always import from index.ts
+[LEARNING] shadcn Button requires forwardRef when wrapping
+[GAP] Auth middleware - needs rate limiting for login endpoint
 ```
 
 Run `/choo-choo-ralph:harvest` to gather learnings and propose documentation artifacts (skills, CLAUDE.md updates, reference docs).
@@ -289,7 +335,7 @@ The JSON/PRD approach works, but has limitations:
 | **Workflows** | Fixed steps | Customizable formulas per task type |
 | **Context** | Grows unbounded | Each task has its own bounded context |
 
-Choo Choo Ralph combines Ralph's simple outer loop with Anthropic's structured inner workflow. [Beads](https://github.com/beads-project/beads) provides the task management - each bead contains its own history, so context stays bounded.
+Choo Choo Ralph combines Ralph's simple outer loop with Anthropic's structured inner workflow. [Beads](https://github.com/steveyegge/beads) provides the task management - each bead contains its own history, so context stays bounded.
 
 ### Claude Code's Ralph Plugin
 
@@ -467,7 +513,7 @@ Ralph uses these labels for workflow:
 - [Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) - Two-agent pattern, verification
 
 **Tools**
-- [Beads](https://github.com/beads-project/beads) - Git-backed issue tracker with molecules
+- [Beads](https://github.com/steveyegge/beads) - Git-backed issue tracker with molecules
 - [dev-browser](https://github.com/SawyerHood/dev-browser) - Browser automation for Claude Code
 - [Claude Code](https://claude.com/claude-code) - Anthropic's CLI for agentic coding
 
