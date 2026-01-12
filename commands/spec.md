@@ -67,44 +67,12 @@ Both sub-agents should return concise summaries (not full docs) that inform spec
 With context gathered:
 
 - Accept plan from conversation context or file path ({{source}})
-- Invoke `/choo-choo-ralph:spec-generation` skill for format guidance
+- Invoke the `/choo-choo-ralph:spec-generation` skill for format guidance (includes `<context>` section format)
 - **Get current date** by running `date +%Y-%m-%d` bash command for the frontmatter `created` field
-- **Include codebase context** in the spec (see Context Section below)
+- **Include research findings** in the spec's `<context>` section
 - Generate at `.choo-choo-ralph/<name>.spec.md`
 
-### Context Section in Spec
-
-The generated spec should include a `<context>` section with research findings:
-
-```xml
-<context>
-  <existing_patterns>
-    - Authentication follows pattern in src/auth/
-    - Components use shadcn/ui conventions
-    - API routes in src/app/api/ use route handlers
-  </existing_patterns>
-  <integration_points>
-    - Will extend existing UserService in src/services/user.ts
-    - Uses existing database schema in prisma/schema.prisma
-    - Integrates with existing middleware in src/middleware.ts
-  </integration_points>
-  <new_technologies>
-    - Stripe: Use stripe-node SDK, webhook verification required
-    - Research note: Use Stripe Elements for PCI compliance
-  </new_technologies>
-  <conventions>
-    - File naming: kebab-case for files, PascalCase for components
-    - Tests colocated with source files (*.test.ts)
-    - Use zod for validation schemas
-  </conventions>
-</context>
-```
-
-This context helps:
-- Tasks reference existing patterns to follow
-- Integration points are explicit
-- New tech has research notes attached
-- Conventions are documented for consistency
+The spec-generation skill defines the full format including the `<context>` section structure for existing_patterns, integration_points, new_technologies, and conventions.
 
 ## Mode 2: Refine Based on Comments (Review Loop)
 
