@@ -59,36 +59,51 @@ If no spec file provided or found:
    - If only one formula exists, use it automatically
    - If multiple formulas exist, ask user to choose
 
-## Target Tasks
+## Task Granularity (CRITICAL)
 
-If `{{target-tasks}}` is provided (e.g., 30):
+**Spec tasks are NOT implementation tasks.** Each spec task must be broken down into multiple granular implementation tasks (molecules).
 
-- Guide the spec parsing to aim for ~30 top-level tasks
-- Each task becomes one molecule root
-- Formula steps multiply this (4-step formula × 30 tasks = ~120 total beads)
-- This is a guide, not a hard requirement
+### The Breakdown Process
+
+1. **Spec tasks** = High-level features/capabilities from the spec
+2. **Implementation tasks** = Granular, atomic units of work (molecules)
+3. **Formula steps** = Workflow phases within each task (bearings, implement, verify, commit) - these are NOT counted toward task granularity
+
+**Example:**
+- Spec has 10 high-level tasks
+- Each spec task breaks down into 5-10 implementation tasks
+- Target: 50-100 implementation tasks (molecules)
+- Formula steps (6 per molecule) are internal workflow, NOT part of task count
+
+### Target Implementation Tasks
+
+If `{{target-tasks}}` is provided (e.g., 80):
+
+- This is the target number of **implementation tasks (molecules)**, NOT spec tasks
+- Break down spec tasks to reach this target
+- A spec with 10 tasks targeting 80 molecules = ~8 implementation tasks per spec task
 
 ### Default Targets (Guidance)
 
-If `{{target-tasks}}` is NOT provided, use these defaults based on project scope:
+If `{{target-tasks}}` is NOT provided, use these defaults:
 
-| Project Type     | Target Tasks  | Rationale              |
-| ---------------- | ------------- | ---------------------- |
-| Single feature   | 5-15 tasks    | Focused scope          |
-| Feature set      | 30-50 tasks   | Default sweet spot     |
-| Full application | 100-200 tasks | Comprehensive coverage |
+| Project Type     | Target Molecules | Breakdown Ratio        |
+| ---------------- | ---------------- | ---------------------- |
+| Single feature   | 15-30 tasks      | ~5-10 per spec task    |
+| Feature set      | 50-100 tasks     | ~5-8 per spec task     |
+| Full application | 150-300 tasks    | ~5-10 per spec task    |
 
-**Why more granular tasks are better:**
+### What Makes a Good Implementation Task
 
-- Smaller tasks = easier verification
-- Clear progress tracking
-- Atomic commits
-- Lower risk per change
+Each implementation task (molecule) should be:
 
-**Each task should:**
+- **Atomic**: One focused change (e.g., "Add login form component", not "Build authentication")
+- **Independently verifiable**: Can be tested in isolation
+- **Small commit**: Results in a single, focused commit
+- **30-60 minutes of work**: If it takes longer, break it down further
 
-- Be independently verifiable via test steps
-- Result in a single, focused commit
+**WRONG:** "User Authentication" as one molecule
+**RIGHT:** Break into: "Create login form", "Add form validation", "Implement auth API", "Add session storage", "Create logout flow", etc.
 
 ## Test Step Generation
 
@@ -116,12 +131,17 @@ Spec task "User Authentication" with integration test steps might pour into:
 
 1. **Determine source**: Spec file or conversation
 2. **Select formula**: Use provided, auto-select, or prompt
-3. **Parse tasks**: Extract from source, respecting target-tasks if set
-4. **Read spec frontmatter variables**: Extract optional fields for formula variables:
+3. **Parse spec tasks**: Extract high-level tasks from source
+4. **Break down into implementation tasks** (CRITICAL):
+   - Each spec task → multiple granular implementation tasks
+   - Target 5-10 implementation tasks per spec task
+   - Each implementation task = one molecule
+   - See "Task Granularity" section above for guidance
+5. **Read spec frontmatter variables**: Extract optional fields for formula variables:
    - `auto_discovery` (default: `false`) - Enable auto task creation from gaps
    - `auto_learnings` (default: `false`) - Enable auto skill creation from learnings
-5. **Generate test steps**: Create granular test steps for each bead based on spec test steps
-6. **For each task**, run:
+6. **Generate test steps**: Create granular test steps for each implementation task
+7. **For each implementation task**, run:
    ```bash
    bd --no-daemon mol pour {{formula}} \
      --var title="{{task.title}}" \
@@ -138,8 +158,8 @@ Spec task "User Authentication" with integration test steps might pour into:
    - The `category` variable comes from the spec task's category attribute
    - The `auto_discovery` and `auto_learnings` variables come from spec frontmatter (default to `false`)
    - **Capture the root bead ID** from each `bd mol pour` output for the poured array
-7. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
-8. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
+8. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
+9. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
 
 ## Error Recovery
 
