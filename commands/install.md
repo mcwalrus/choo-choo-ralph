@@ -36,19 +36,27 @@ Before installing, check which files already exist:
 
 ## Installation Steps
 
+Use Bash `cp` commands for fast file copying (NOT Read/Write tools).
+
 1. **Copy shell scripts** to project root (if not skipped):
-   - Copy `${CLAUDE_PLUGIN_ROOT}/templates/ralph.sh` to `./ralph.sh`
-   - Copy `${CLAUDE_PLUGIN_ROOT}/templates/ralph-once.sh` to `./ralph-once.sh`
-   - Copy `${CLAUDE_PLUGIN_ROOT}/templates/ralph-format.sh` to `./ralph-format.sh`
-   - Run `chmod +x ralph.sh ralph-once.sh ralph-format.sh`
+   ```bash
+   cp "${CLAUDE_PLUGIN_ROOT}/templates/ralph.sh" ./ralph.sh
+   cp "${CLAUDE_PLUGIN_ROOT}/templates/ralph-once.sh" ./ralph-once.sh
+   cp "${CLAUDE_PLUGIN_ROOT}/templates/ralph-format.sh" ./ralph-format.sh
+   chmod +x ralph.sh ralph-once.sh ralph-format.sh
+   ```
 
 2. **Set up formulas directory**:
-   - Create `.beads/formulas/` if it doesn't exist
-   - Copy `${CLAUDE_PLUGIN_ROOT}/templates/choo-choo-ralph.formula.toml` to `.beads/formulas/` (if not skipped)
-   - Copy `${CLAUDE_PLUGIN_ROOT}/templates/bug-fix.formula.toml` to `.beads/formulas/` (if not skipped)
+   ```bash
+   mkdir -p .beads/formulas
+   cp "${CLAUDE_PLUGIN_ROOT}/templates/choo-choo-ralph.formula.toml" .beads/formulas/
+   cp "${CLAUDE_PLUGIN_ROOT}/templates/bug-fix.formula.toml" .beads/formulas/
+   ```
 
 3. **Create spec directory**:
-   - Create `.choo-choo-ralph/` directory for specs
+   ```bash
+   mkdir -p .choo-choo-ralph
+   ```
 
 4. **Verify installation**:
    - Confirm all files exist
