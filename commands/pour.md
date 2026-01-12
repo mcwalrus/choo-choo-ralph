@@ -126,12 +126,24 @@ When pouring spec tasks into beads, **generate granular test steps** for each be
 - **Spec-level test steps** = Integration guidance (kept for reference)
 - **Bead-level test steps** = Specific verification for this task (generated)
 
-For each bead created, include 4-5 test steps in the task description that:
+### Test Step Complexity (Important)
+
+Use a **mix of test step complexity** based on the task:
+
+| Task Type | Test Steps | Examples |
+|-----------|------------|----------|
+| Simple/focused | 2-5 steps | Button styling, color theme, simple validation |
+| Standard feature | 5-8 steps | Form component, API endpoint, data display |
+| Complex workflow | 10+ steps | Multi-step flows, auth flows, payment processing |
+
+**Guideline**: At least 20% of tasks should have 10+ test steps (the complex ones need thorough verification).
+
+For each bead created, include test steps that:
 
 1. Are specific to what this bead implements
 2. Can be verified independently
 3. Include expected outcomes
-4. Support both automated and manual testing
+4. Match complexity to task importance
 
 **Example transformation:**
 
@@ -154,8 +166,14 @@ Spec task "User Authentication" with integration test steps might pour into:
 5. **Read spec frontmatter variables**: Extract optional fields for formula variables:
    - `auto_discovery` (default: `false`) - Enable auto task creation from gaps
    - `auto_learnings` (default: `false`) - Enable auto skill creation from learnings
-6. **Generate test steps**: Create granular test steps for each implementation task
-7. **For each implementation task**, run:
+6. **Generate test steps**: Create granular test steps for each implementation task (see Test Step Complexity above)
+7. **Pour tasks using sub-agents** (for context preservation and speed):
+   - Group implementation tasks into batches of 10-15 tasks
+   - Launch 5-10 sub-agents in parallel, each handling one batch
+   - Each sub-agent runs the pour commands for its batch
+   - This keeps context lean and speeds up the pour process
+
+   Each sub-agent runs for its batch:
    ```bash
    bd --no-daemon mol pour {{formula}} \
      --var title="{{task.title}}" \
@@ -172,8 +190,12 @@ Spec task "User Authentication" with integration test steps might pour into:
    - The `category` variable comes from the spec task's category attribute
    - The `auto_discovery` and `auto_learnings` variables come from spec frontmatter (default to `false`)
    - **Capture the root bead ID** from each `bd mol pour` output for the poured array
-8. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
-9. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
+8. **Set priority on each root bead**:
+   - After pouring, update each root bead with its priority from the spec task
+   - Run: `bd update <root-bead-id> --priority {{task.priority}}`
+   - Priority values: 0-4 (0=critical, 1=high, 2=medium, 3=low, 4=backlog)
+9. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created root bead IDs (see below)
+10. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
 
 ## Error Recovery
 
