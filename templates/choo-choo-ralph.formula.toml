@@ -139,7 +139,7 @@ Before exploring for this task, verify the app is healthy:
 1. **Start dev server** (if not running) and verify it starts successfully
 2. **Run test suite** - Execute existing tests (check CLAUDE.md or package.json for commands)
 3. **Smoke test via dev-browser** - Navigate to the app and verify a core flow works
-   - Use the dev-browser skill
+   - Use the /dev-browser skill
    - Pick a completed feature from recent work
    - Verify it still functions correctly
 
@@ -277,7 +277,7 @@ Validate that the implementation works correctly through automated AND manual ve
 
 ## UI Verification (if applicable)
 
-If this task involves UI changes, use the dev-browser skill:
+If this task involves UI changes, use the /dev-browser skill:
 
 1. Navigate to the affected page
 2. Follow any test steps from the task description

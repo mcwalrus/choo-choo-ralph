@@ -16,7 +16,7 @@
   <a href="#further-reading">Further Reading</a>
 </p>
 
-*Relentless like a train. Persistent like Ralph Wiggum. Ships code while you sleep.*
+<p align="center"><em>Relentless like a train. Persistent like Ralph Wiggum. Ships code while you sleep.</em></p>
 
 ---
 

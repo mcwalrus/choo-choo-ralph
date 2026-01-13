@@ -2,7 +2,7 @@ formula = "bug-fix"
 description = """
 # BUG FIX ORCHESTRATOR: {{title}}
 
-You are the orchestrator for fixing a bug.
+You coordinate child steps for this bug fix.
 
 ## Bug Details
 {{task}}
@@ -10,31 +10,15 @@ You are the orchestrator for fixing a bug.
 ## Related Epic
 This bug may be related to: {{related_epic}}
 
-## Your Children
-This molecule has 4 sequential steps:
-1. **diagnose** - Understand the bug and find root cause (Sub-agent)
-2. **fix** - Make the code changes to fix it (Sub-agent)
-3. **verify** - Run tests and validate the fix (Sub-agent)
-4. **commit** - Create git commit (Inline - you do this)
+## Execution Loop
 
-## Execution Instructions
-
-### Sub-Agent Steps (diagnose, fix, verify)
-For steps with assignee `ralph-subagent-*`:
-1. Check if ready: `bd ready --parent <your-id>`
-2. Get step details: `bd show <step-id> --json`
-3. Spawn a Task agent with the step's bead JSON as context
-4. Wait for the sub-agent to complete and return its findings
-5. Act on the sub-agent's report (see step-specific handling below)
-6. Close the step: `bd close <step-id>`
-7. Proceed to next step once dependency is satisfied
-
-### Inline Step (commit)
-For steps with assignee `ralph-inline-*`:
-1. Execute the step yourself directly
-2. Follow the step's description for instructions
-3. Close the step when done: `bd close <step-id>`
-4. Add a comment summarizing what was done
+1. **Find ready steps**: `bd ready --parent <your-id>`
+2. **For each ready step**, route by assignee prefix:
+   - `ralph-subagent-*`: Spawn a Task agent with the step's description (from `bd show <step-id>`)
+   - `ralph-inline-*`: Execute the step yourself following its description
+3. **Read what each step reports** and follow its instructions exactly
+4. **Close completed steps**: `bd close <step-id>`
+5. **Repeat** until no more steps
 
 ## Commands
 - Check ready children: `bd ready --parent <your-id>`
@@ -42,83 +26,34 @@ For steps with assignee `ralph-inline-*`:
 - Close completed step: `bd close <step-id>`
 - Add progress note: `bd comments add <step-id> "..."`
 
-## Handling Step Results
+## Following Step Instructions
 
-### After Diagnose Step
-The diagnose sub-agent will report back with one of:
-- **REPRODUCIBLE**: Root cause found, files identified, ready for fix
-- **CANNOT_REPRODUCE**: Issue not reproducible after investigation
+Each step will report back with:
+- A STATUS (e.g., REPRODUCIBLE, CANNOT_REPRODUCE, PASS, FAIL)
+- Instructions for what you should do next
 
-If CANNOT_REPRODUCE:
-1. Add comment: `bd comments add <your-id> "[cannot-reproduce] <investigation summary>"`
-2. Close the bug: `bd close <your-id> --reason "Cannot reproduce after investigation"`
-3. Exit
+**You must follow the step's instructions.** Steps may tell you to:
+- Proceed to the next step
+- Reopen a previous step with guidance
+- Close the bug as non-reproducible
+- Mark yourself as blocked
 
-### After Fix Step
-The fix sub-agent will report what was changed. Close the step and proceed to verify.
-
-### After Verify Step
-The verify sub-agent will report one of:
-- **PASS**: Bug is fixed, all checks pass
-- **FAIL**: Bug still present or new issues found
-
-If FAIL:
-1. Check attempt count (count `[attempt-N]` comments on your bead)
-2. If < 3 attempts:
-   - Add attempt comment: `bd comments add <your-id> "[attempt-N] Fix attempt N: FAIL - <reason from verify>"`
-   - Reopen fix step: `bd update <fix-step-id> --status open`
-   - Add guidance to fix step: `bd comments add <fix-step-id> "[REWORK] <what verify found wrong>"`
-   - Loop back to wait for fix step
-3. If >= 3 attempts: Execute blocking logic (see below)
-
-If PASS:
-- Add attempt comment: `bd comments add <your-id> "[attempt-N] Fix attempt N: PASS"`
-- Proceed to commit step
-
-## Attempt Tracking
-
-Before processing verify results, count `[attempt-N]` comments on your bead.
-
-### If 3+ Attempts Failed
-
-1. **Add critical comment**:
-   ```bash
-   bd comments add <your-id> "[CRITICAL] Bug cannot be resolved after 3 attempts. Requires human intervention."
-   ```
-
-2. **Block yourself**:
-   ```bash
-   bd update <your-id> --status blocked
-   ```
-
-3. **Exit**
+Do exactly what the step tells you. The step knows its domain.
 
 ## Completion
 
-When all 4 steps are closed successfully:
+When your work is done:
 
 1. **Review learning comments** - Check if any steps added `[diagnose]`, `[fix]`, or `[verify]` comments to your bead
-2. **Synthesize patterns** - If learnings were added, consider:
-   - What caused this bug? Is it a pattern that could happen again?
-   - Should something be added to CLAUDE.md to prevent recurrence?
-   - Is there a skill that could help avoid this type of bug?
-3. **Add summary comment**:
-   ```
+2. **Add summary comment**:
+   ```bash
    bd comments add <your-id> "[summary] Fixed: <what>. Root cause: <cause>. Prevention: <if any>"
    ```
-4. **Add learnings label** - If your summary includes prevention recommendations:
-   ```
+3. **Add learnings label** - If your summary includes prevention recommendations:
+   ```bash
    bd label add <your-id> learnings
    ```
-5. **Close yourself** with `bd close <your-id>`
-
-### Learning Synthesis Guidelines
-- Bug fixes often reveal gaps in documentation or skills
-- If the root cause was a missing pattern → note "Consider adding to CLAUDE.md: ..."
-- If similar bugs keep appearing → note "Consider creating skill for: ..."
-- Focus on prevention, not just the fix
-
-**IMPORTANT**: Complete this entire molecule (all 4 steps), then exit. Do NOT look for or grab another molecule.
+4. **Close yourself**: `bd close <your-id>`
 
 Your ID is in the bead data you received.
 """
@@ -169,22 +104,28 @@ If after thorough investigation you CANNOT reproduce the issue:
 
 Add a comment to THIS bead with your findings, then report to orchestrator.
 
-**If reproducible**, your report should include:
+**If reproducible**:
 ```
 STATUS: REPRODUCIBLE
 ROOT_CAUSE: <what's broken>
 FILES: <files that need to change>
 APPROACH: <recommended fix>
+
+ACTION: Close this step and proceed to fix.
 ```
 
-**If not reproducible**, your report should include:
+**If not reproducible**:
 ```
 STATUS: CANNOT_REPRODUCE
 INVESTIGATION: <what you tried>
 LIKELY_CAUSE: <flaky test / transient failure / already fixed>
-```
 
-The orchestrator will decide next steps based on your report.
+ACTION: You must handle this non-reproducible bug:
+1. Add comment to root: `bd comments add <root-id> "[cannot-reproduce] <investigation summary>"`
+2. Close this step: `bd close <this-step-id>`
+3. Close the bug: `bd close <root-id> --reason "Cannot reproduce after investigation"`
+4. Exit - do not continue with other steps
+```
 
 ## Learnings (if applicable)
 If you discovered something noteworthy, add a comment to the ROOT/PARENT bead (not this step):
@@ -223,12 +164,13 @@ Make the code changes to fix the bug. Report what was changed back to orchestrat
 
 Add a comment to THIS bead summarizing your changes:
 ```
+STATUS: DONE
 CHANGES: <what was changed>
 RATIONALE: <why this fixes the issue>
 VERIFY_FOCUS: <specific things verify should check>
-```
 
-The orchestrator will close this step and proceed to verification.
+ACTION: Close this step and proceed to verify.
+```
 
 ## Learnings (if applicable)
 If you encountered something noteworthy, add a comment to the ROOT/PARENT bead (not this step):
@@ -271,6 +213,11 @@ Add a comment to THIS bead with verification results.
 STATUS: PASS
 VERIFICATION: <what was checked>
 RESULT: Bug no longer reproducible, all checks pass
+
+ACTION: You must record this success:
+1. Count `[attempt-N]` comments on root bead: `bd comments <root-id>`
+2. Add attempt comment: `bd comments add <root-id> "[attempt-N] Fix attempt N: PASS"`
+3. Close this step and proceed to commit.
 ```
 
 **If fix failed**:
@@ -278,9 +225,21 @@ RESULT: Bug no longer reproducible, all checks pass
 STATUS: FAIL
 ISSUE: <what's still broken or what new issue appeared>
 SUGGESTION: <what the fix step should try differently>
-```
 
-The orchestrator will decide next steps based on your report. Do NOT reopen the fix step yourself - that's the orchestrator's job.
+ACTION: You must handle this verification failure:
+1. Count `[attempt-N]` comments on root bead: `bd comments <root-id>`
+2. If < 3 attempts:
+   - Add attempt comment: `bd comments add <root-id> "[attempt-N] Fix attempt N: FAIL - <ISSUE from above>"`
+   - Reopen fix step: `bd update <fix-step-id> --status open`
+   - Add guidance: `bd comments add <fix-step-id> "[REWORK] <SUGGESTION from above>"`
+   - Close this verify step: `bd close <this-step-id>`
+   - Wait for fix to complete, then verify again
+3. If >= 3 attempts:
+   - Add critical comment: `bd comments add <root-id> "[CRITICAL] Bug cannot be resolved after 3 attempts. Requires human intervention."`
+   - Block root: `bd update <root-id> --status blocked`
+   - Close this verify step: `bd close <this-step-id>`
+   - Exit
+```
 
 ## Learnings (if applicable)
 If you encountered something noteworthy, add a comment to the ROOT/PARENT bead (not this step):
@@ -321,9 +280,16 @@ Refs: <this-bead-id>
 3. **Write commit message** - Follow conventional commits format
 4. **Create commit** - Use the commit skill or git directly
 
-## Output
-Add a comment with:
-- The commit hash
-- The commit message used
-- Confirmation the commit was successful
+## Output to Orchestrator
+
+Add a comment with the commit details:
+```
+STATUS: DONE
+COMMIT: <commit hash>
+MESSAGE: <commit message summary>
+
+ACTION: Close this step. All steps complete.
+```
+
+When complete, close this bead with `bd close <this-bead-id>`.
 """
