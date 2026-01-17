@@ -9,7 +9,7 @@ Set up the Ralph autonomous coding workflow in this project.
 ## Pre-requisites Check
 
 1. **Check beads CLI**: Run `bd --version`
-   - If not installed: "Please install beads first. See: https://github.com/beads-project/beads"
+   - If not installed: "Please install beads first. See: https://github.com/steveyegge/beads"
 
 2. **Check Claude CLI**: Run `claude --version`
    - If not installed: Warn user they'll need it to run Ralph
