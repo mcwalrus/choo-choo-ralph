@@ -4,6 +4,8 @@ set -e
 # Choo Choo Ralph - Autonomous coding loop
 # Usage: ./ralph.sh [max_iterations] [--verbose|-v]
 
+# Default iteration limit. One iteration = one task attempt.
+# For testing, start smaller: ./ralph.sh 10
 MAX_ITERATIONS=100
 VERBOSE_FLAG=""
 

@@ -125,6 +125,9 @@ By using this project, you accept full responsibility for any consequences.
 # Or with verbose output to observe what's happening
 ./ralph.sh --verbose
 
+# Note: Default is 100 iterations (one iteration = one task attempt).
+# For testing, start smaller: ./ralph.sh 10 runs just 10 iterations.
+
 # After tasks complete, harvest learnings
 /choo-choo-ralph:harvest
 ```
