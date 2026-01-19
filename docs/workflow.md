@@ -332,6 +332,20 @@ Acceptance criteria incomplete. Add:
 
 ## Step 3: Pour the Spec into Beads
 
+### Why Granularize?
+
+Pouring takes your reviewed spec tasks and breaks them into even smaller, more atomic units of work. This granularization is intentional and serves several purposes:
+
+**More consistent results** - Smaller tasks are easier for the agent to understand and execute correctly. A task like "add user authentication" is ambiguous; "create password hashing utility function" is clear.
+
+**Less wasted usage** - When a large task fails partway through, you lose all the work. Small tasks mean failures are contained—if one breaks, the others still succeed.
+
+**Better verification at each step** - Each small task goes through the full bearings → implement → verify → commit cycle. This catches issues early rather than accumulating problems across a large implementation.
+
+**Improved quality for unmonitored runs** - When running autonomously (especially overnight), smaller scope means more checkpoints. The agent verifies, tests, and commits at each step rather than building up a large, potentially broken changeset.
+
+The target number of tasks depends on your project size and complexity. More granular is generally better—three similar lines of working code beat one ambitious abstraction that doesn't quite work.
+
 ### What Pouring Does
 
 Pouring transforms your reviewed spec tasks into executable Beads issues. Each task becomes a bead that Ralph can pick up and work on.
@@ -434,7 +448,17 @@ If you don't specify all arguments, pour will prompt you interactively:
 2. **Formula selection** (workflow mode only): Choose which formula if multiple exist
 3. **Confirmation**: "Pour all tasks", "Show task overview first", or "Cancel"
 
-Choosing "Show task overview first" saves a preview to `.choo-choo-ralph/pour-preview.md` for review before committing to the pour.
+### Preview Before Pouring
+
+Choosing "Show task overview first" writes all proposed beads to `.choo-choo-ralph/pour-preview.md` without creating them. This gives you a chance to review the granularized tasks before committing.
+
+The preview shows:
+- Task title
+- Description snippet
+- Category and priority
+- Test step count
+
+Review the preview file in your editor. If the breakdown looks wrong—tasks too big, too small, missing steps, or unclear—go back and refine your spec before pouring. Once you're satisfied, run `/choo-choo-ralph:pour` again and choose "Pour all tasks".
 
 ### What Happens After Pour
 
@@ -515,6 +539,18 @@ For each task, Ralph follows the configured formula. With the default workflow f
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### On the Loop, Not In the Loop
+
+There's an important distinction between being **in the loop** (approving each action) and being **on the loop** (observing the system run).
+
+With Ralph, you're on the loop: you're not approving individual tool calls or code changes, but you are watching and learning. This observation is valuable for improving your setup:
+
+- **Refine prompts** - Notice when the agent gets confused or takes wrong turns? Adjust the formula prompts.
+- **Tune workflows** - See steps that consistently fail? Maybe the verification is too strict, or bearings needs more guidance.
+- **Identify patterns** - Watch what the agent does well and what it struggles with. Feed that back into your spec reviews.
+
+The best results come from actively sitting on the loop—not micromanaging, but observing so you can iterate on your prompts, formulas, and workflow steps. Each run teaches you something about what works for your codebase.
 
 ### Observing the Loop
 

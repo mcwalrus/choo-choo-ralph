@@ -110,7 +110,12 @@ Convert spec tasks into beads (issues) for Ralph to work on.
 
 1. **Mode Selection** - Create all tasks or incremental batch
 2. **Formula Selection** - Choose workflow formula (if not specified)
-3. **Confirmation** - Review tasks before creation
+3. **Confirmation** - One of:
+   - "Pour all tasks" - Create beads immediately
+   - "Show task overview first" - Write preview to `.choo-choo-ralph/pour-preview.md` for review
+   - "Cancel" - Exit without creating beads
+
+The preview option is useful for reviewing how spec tasks will be granularized before committing. If the breakdown doesn't look right, refine your spec and try again.
 
 ### Default Task Targets
 
