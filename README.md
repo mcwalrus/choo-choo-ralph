@@ -10,48 +10,26 @@
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
-  <a href="#the-workflow">The Workflow</a> •
-  <a href="#compounding-knowledge">Compounding Knowledge</a> •
+  <a href="#what-you-get">What You Get</a> •
+  <a href="#why-beads">Why Beads</a> •
   <a href="#documentation">Documentation</a>
 </p>
 
 <p align="center"><em>Relentless like a train. Persistent like Ralph Wiggum. Ships code while you sleep.</em></p>
 
-> **🧪 Experimental** — This workflow is being actively developed and tested on real projects. The approach works well for me: smaller, verified tasks trade higher Claude Code usage for more reliable outcomes. Your mileage may vary. I'd love feedback on what works and what doesn't.
+> **🧪 Experimental** — This workflow is actively tested on real projects. Smaller, verified tasks trade higher Claude Code usage for more reliable outcomes. Your mileage may vary—I'd love feedback on what works and what doesn't.
 
 ---
 
-## The Idea
+## What is Choo Choo Ralph?
 
-Most autonomous coding setups fall into two traps:
+A [Claude Code](https://claude.com/claude-code) plugin that turns your plans into autonomous, verified work—designed for teams, not just side projects.
 
-1. **Too simple** - Run Claude in a loop, hope for the best, watch it spiral when something breaks
-2. **Too complex** - Build elaborate orchestration that's harder to debug than the code it writes
+Most Ralph implementations use GitHub Issues (latency), scattered markdown files (messy), or monolithic JSON (doesn't scale). Choo Choo Ralph uses [Beads](https://github.com/steveyegge/beads)—a git-native task tracker where every task has an ID, workflows have real dependencies, and everything syncs through git the way your team already works.
 
-Choo Choo Ralph is neither. The outer loop is dead simple. The workflow inside each task is structured and verified. Each task remembers its own history across sessions.
+**The thesis**: Simple loop + structured workflows + persistent memory = autonomous coding that actually works.
 
-**The thesis**: Simple loop + smart workflow + persistent memory = autonomous coding that actually works.
-
-### What We Don't Do
-
-Planning. Your planning process is yours - downloading repos, grepping through code, iterating with different AI agents, writing markdown docs that evolve through discussion. That's creative, messy work that can't be captured in a command.
-
-### What We Do
-
-Take your plan - however rough or polished - and turn it into something an autonomous agent can execute reliably:
-
-1. **Spec** - Structure your plan into reviewable tasks with test steps
-2. **Pour** - Break those into granular, atomic units of work
-3. **Run** - Execute them one by one with verification
-4. **Learn** - Capture what the agents discover along the way
-
-## What You Get
-
-- **Verified, not vibes** - Health checks before implementing, tests and browser verification after
-- **Bounded context** - Each task tracks its own history via [Beads](https://github.com/steveyegge/beads), no context window bloat
-- **Structured phases** - Bearings → Implement → Verify → Commit (not just "do the thing")
-- **Compounding knowledge** - Agents capture learnings as they work; [harvest](#compounding-knowledge) them into skills and docs that make future sessions smarter
-- **Pick up where you left off** - Tasks persist across sessions, crashes, and context resets
+---
 
 ## The Workflow
 
@@ -62,29 +40,30 @@ Take your plan - however rough or polished - and turn it into something an auton
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
 ```
 
-1. **Plan** - Write what you want to build *(this is on you - we don't do planning)*
-2. **Spec** - AI transforms it into structured tasks; you review and refine
-3. **Pour** - Tasks become beads (workflow or singular)
-4. **Ralph** - The loop runs autonomously until done
-5. **Harvest** - Extract learnings into skills, docs, or CLAUDE.md
+1. **Plan** — Write what you want to build (this part is yours)
+2. **Spec** — AI transforms it into structured tasks; you review
+3. **Pour** — Tasks become beads with workflows and dependencies
+4. **Ralph** — The loop runs autonomously until done
+5. **Harvest** — Extract learnings into skills, docs, or CLAUDE.md
 
-For the complete step-by-step guide, see [docs/workflow.md](docs/workflow.md).
+---
 
-## Prerequisites
+## What You Get
 
-- [Claude Code](https://claude.com/claude-code) - Anthropic's CLI
-- [Beads](https://github.com/steveyegge/beads) - Git-backed issue tracker (`bd` command)
-- [jq](https://jqlang.github.io/jq/) - JSON parsing
-
-**Recommended:**
-- [dev-browser](https://github.com/SawyerHood/dev-browser) - Browser automation for UI verification
+- **Verified, not vibes** — Health checks before implementing, tests after, browser verification when needed
+- **Team-friendly** — Git-native sync, no API latency, works with how your team already collaborates
+- **Traceable** — Bead IDs link commits to tasks, learnings to work. Full history of what happened where.
+- **Structured phases** — Bearings → Implement → Verify → Commit (not just "do the thing")
+- **Bounded context** — Each task carries its own history via [Beads](https://github.com/steveyegge/beads), no context window bloat
+- **Compounding knowledge** — Agents capture learnings as they work; harvest them into skills and docs that make future sessions smarter
+- **Customizable workflows** — Formulas and scripts are yours to modify, not hardcoded decisions
 
 ---
 
 ## Quick Start
 
 <details>
-<summary>⚠️ <strong>Safety Warning</strong> - Read before running</summary>
+<summary>⚠️ <strong>Safety Warning</strong> — Read before running</summary>
 
 Ralph runs Claude with `--dangerously-skip-permissions`, which allows it to execute commands without confirmation. This is powerful but risky.
 
@@ -97,6 +76,8 @@ Ralph runs Claude with `--dangerously-skip-permissions`, which allows it to exec
 By using this project, you accept full responsibility for any consequences.
 
 </details>
+
+**Prerequisites:** [Claude Code](https://claude.com/claude-code), [Beads](https://github.com/steveyegge/beads) (`bd` command), [jq](https://jqlang.github.io/jq/)
 
 ```bash
 # Install plugin
@@ -116,34 +97,39 @@ By using this project, you accept full responsibility for any consequences.
 ./ralph.sh
 ```
 
-For the complete workflow guide, see [docs/workflow.md](docs/workflow.md).
+For the complete workflow, see [docs/workflow.md](docs/workflow.md).
 
 ---
 
-## Why "Choo Choo Ralph"?
+## The Problem
 
-**Choo Choo** - Like a train with carts. Each cart is a containerized block of work - self-contained, carrying its own context and history. The train keeps moving forward, cart after cart, toward your destination.
+Most autonomous coding setups fall into two traps:
 
-**Ralph** - Named after the [Ralph Wiggum technique](https://ghuntley.com/ralph/): run an AI in a loop until it's done. Simple, relentless, surprisingly effective. Ralph makes mistakes, gets confused, but never stops trying.
+1. **Too simple** — Run Claude in a loop, hope for the best, watch it spiral when something breaks
+2. **Too complex** — Build elaborate orchestration that's harder to debug than the code it writes
+
+And most Ralph implementations work fine for side projects but break down for teams. GitHub Issues introduce API latency. Scattered markdown files don't scale. Big JSON files or progress trackers get clunky when multiple people are involved.
+
+Choo Choo Ralph is designed for real teams. The outer loop is dead simple. The workflow inside each task is structured and verified. Every task has an ID that traces through to commits and learnings. And everything syncs through git—no extra infrastructure.
 
 ---
 
 ## Why Beads?
 
-Choo Choo Ralph requires [Beads](https://github.com/steveyegge/beads) for task management. Here's why:
+Choo Choo Ralph requires [Beads](https://github.com/steveyegge/beads). Here's why it's worth adding to your stack:
 
-**Molecules (Workflows)** - Formulas define multi-step workflows that automatically create parent tasks with child steps. Sub-agents verify independent steps that still relate to the main task.
+**Solves the team problem** — Beads syncs via git, not APIs. No rate limits, no latency, no network errors when agents update tasks. Works with how your team already collaborates.
 
-**Clean CLI** - All the organizational work is abstracted behind `bd` commands. No cluttering your codebase with planning files.
+**Structured workflows, not checklists** — Molecules define multi-step workflows with real dependencies. Agents follow the structure instead of winging it.
 
-**Local-First** - Beads runs locally with no network layer. Unlike GitHub Issues, agents don't hit rate limits or network errors when updating tasks.
+**Traceability** — Every bead has an ID. Link commits to tasks, learnings to specific work. When something goes wrong (or right), you know where it came from.
 
-**Git-Native** - Everything syncs to git as JSONL. You can convert to Markdown later if needed, and all history is preserved.
+**Bounded context** — Each bead carries its own history. Context stays contained instead of growing unbounded across sessions.
 
-**Bounded Context** - Each bead carries its own history. Context stays contained instead of growing unbounded.
+**Clean abstraction** — All the organizational work is behind `bd` commands. No cluttering your codebase with planning files.
 
 > [!IMPORTANT]
-> Beads is a **hard requirement** for Choo Choo Ralph. The plugin's pour and formula system depends on Beads' molecule feature to create multi-step workflows.
+> Beads is a **hard requirement**. The plugin's pour and formula system depends on Beads' molecule feature to create multi-step workflows.
 
 ---
 
@@ -160,11 +146,11 @@ Iteration 4: New agent benefits from skills → Works faster → Discovers more
 ```
 
 **The flywheel:**
-1. **Code** - Each task produces working, tested, committed code
-2. **Memory** - Agents capture gaps and learnings as comments on beads
-3. **Harvest** - You extract valuable patterns into skills, CLAUDE.md, docs
-4. **Compound** - Future iterations benefit from accumulated knowledge
-5. **Repeat** - The system gets smarter with every session
+1. **Code** — Each task produces working, tested, committed code
+2. **Memory** — Agents capture gaps and learnings as comments on beads
+3. **Harvest** — You extract valuable patterns into skills, CLAUDE.md, docs
+4. **Compound** — Future iterations benefit from accumulated knowledge
+5. **Repeat** — The system gets smarter with every session
 
 Run `/choo-choo-ralph:harvest` after a session to gather learnings and propose documentation artifacts.
 
@@ -172,42 +158,51 @@ Run `/choo-choo-ralph:harvest` after a session to gather learnings and propose d
 
 ## Customization
 
-When you run `/choo-choo-ralph:install`, you get local copies of everything—shell scripts, formulas, and config. These files are yours to modify. One project might need tweaked prompts; another works fine with defaults.
+When you run `/choo-choo-ralph:install`, you get local copies of everything—shell scripts, formulas, and config. These are yours to modify.
+
+This is intentional. We didn't want a CLI with hardcoded decisions. We wanted best practices as a starting point that you can adapt per-project. One project might need tweaked prompts; another works fine with defaults.
 
 **What you can customize:**
+- **Shell scripts** (`ralph.sh`, `ralph-once.sh`) — Loop behavior, task limits, output formatting
+- **Formulas** (`.beads/formulas/`) — Workflow steps, prompts, verification requirements
+- **Specs** (`.choo-choo-ralph/`) — Your planning and review process
 
-- **Shell scripts** (`ralph.sh`, `ralph-once.sh`) - Loop behavior, task limits, output formatting
-- **Formulas** (`.beads/formulas/`) - Workflow steps, prompts, verification requirements
-- **Specs** (`.choo-choo-ralph/`) - Your planning and review process
+For details, see [docs/customization.md](docs/customization.md).
 
-For the complete guide, see [docs/customization.md](docs/customization.md).
+---
+
+## Why "Choo Choo Ralph"?
+
+**Choo Choo** — Like a train with carts. Each cart is a containerized block of work—self-contained, carrying its own context and history. The train keeps moving forward, cart after cart, toward your destination.
+
+**Ralph** — Named after the [Ralph Wiggum technique](https://ghuntley.com/ralph/): run an AI in a loop until it's done. Simple, relentless, surprisingly effective. Ralph makes mistakes, gets confused, but never stops trying.
 
 ---
 
 ## Documentation
 
-- [Complete Workflow Guide](docs/workflow.md) - Step-by-step from planning to harvest
-- [Spec Format Reference](docs/spec-format.md) - XML structure and review process
-- [Commands Reference](docs/commands.md) - All options and arguments
-- [Customization Guide](docs/customization.md) - Adapting Ralph to your project
-- [Formula Reference](docs/formulas.md) - Creating and modifying workflow formulas
-- [Troubleshooting](docs/troubleshooting.md) - Error handling and debugging
+- [Complete Workflow Guide](docs/workflow.md) — Step-by-step from planning to harvest
+- [Spec Format Reference](docs/spec-format.md) — XML structure and review process
+- [Commands Reference](docs/commands.md) — All options and arguments
+- [Customization Guide](docs/customization.md) — Adapting Ralph to your project
+- [Formula Reference](docs/formulas.md) — Creating and modifying workflow formulas
+- [Troubleshooting](docs/troubleshooting.md) — Error handling and debugging
 
 ---
 
 ## Further Reading
 
 **Ralph Technique**
-- [ghuntley.com/ralph](https://ghuntley.com/ralph/) - The original Ralph philosophy
-- [Matt Pocock's Ralph Guide](https://www.aihero.dev/tips-for-ai-coding-with-ralph-wiggum) - Practical tips
+- [ghuntley.com/ralph](https://ghuntley.com/ralph/) — The original Ralph philosophy
+- [Matt Pocock's Ralph Guide](https://www.aihero.dev/tips-for-ai-coding-with-ralph-wiggum) — Practical tips
 
 **Anthropic Research**
-- [Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) - Two-agent pattern, verification
+- [Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — Two-agent pattern, verification
 
 **Tools**
-- [Beads](https://github.com/steveyegge/beads) - Git-backed issue tracker with molecules
-- [dev-browser](https://github.com/SawyerHood/dev-browser) - Browser automation for Claude Code
-- [Claude Code](https://claude.com/claude-code) - Anthropic's CLI for agentic coding
+- [Beads](https://github.com/steveyegge/beads) — Git-backed issue tracker with molecules
+- [dev-browser](https://github.com/SawyerHood/dev-browser) — Browser automation for Claude Code
+- [Claude Code](https://claude.com/claude-code) — Anthropic's CLI for agentic coding
 
 ## License
 
