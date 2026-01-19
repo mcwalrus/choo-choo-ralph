@@ -253,52 +253,70 @@ Spec task "User Authentication" with integration test steps might pour into:
    - Each sub-agent runs the pour commands for its batch
    - This keeps context lean and speeds up the pour process
 
+   > **⚠️ CRITICAL: Assignee Requirement**
+   >
+   > ALL poured tasks MUST include `--assignee ralph`. When instructing sub-agents, you MUST:
+   > 1. Include the **exact command** with `--assignee ralph` in the sub-agent prompt
+   > 2. Do NOT paraphrase or summarize the command - copy it exactly
+   > 3. The sub-agent does NOT have access to this file - it only knows what you tell it
+   >
+   > If tasks are created without `--assignee ralph`, they won't be picked up by the Ralph loop.
+
    **For workflow formula mode**, each sub-agent runs:
 
    ```bash
-   bd --no-daemon mol pour {{formula}} \
-     --var title="{{task.title}}" \
-     --var task="{{task.description}}" \
-     --var category="{{task.category}}" \
-     --var auto_discovery="{{spec.auto_discovery | default: 'false'}}" \
-     --var auto_learnings="{{spec.auto_learnings | default: 'false'}}" \
+   bd --no-daemon mol pour <FORMULA_NAME> \
+     --var title="<TASK_TITLE>" \
+     --var task="<TASK_DESCRIPTION>" \
+     --var category="<TASK_CATEGORY>" \
+     --var auto_discovery="<SPEC_AUTO_DISCOVERY>" \
+     --var auto_learnings="<SPEC_AUTO_LEARNINGS>" \
      --assignee ralph
    ```
+
+   **Placeholder notation:** `<PLACEHOLDER>` values are filled in by YOU (the agent) before running the command. These are NOT processed by beads - you must substitute them with actual values. In contrast, `{{variable}}` in formula files IS processed by beads templating.
 
    Notes for formula mode:
 
    - Use `bd mol pour` (not `bd formula pour`)
    - Use `--var` for variables (not `--set`)
-   - The `task` variable should include the generated test steps appended to the description
-   - The `category` variable comes from the spec task's category attribute
-   - The `auto_discovery` and `auto_learnings` variables come from spec frontmatter (default to `false`)
+   - `<TASK_DESCRIPTION>` should include the generated test steps appended to the description
+   - `<TASK_CATEGORY>` comes from the spec task's category attribute
+   - `<SPEC_AUTO_DISCOVERY>` and `<SPEC_AUTO_LEARNINGS>` come from spec frontmatter (default to `false`)
    - **Capture the root bead ID** from each `bd mol pour` output for the poured array
 
    **For singular task mode**, each sub-agent runs:
 
    ```bash
-   bd --no-daemon create "{{task.title}}" \
-     --description "{{task.description_with_template}}" \
+   bd --no-daemon create "<TASK_TITLE>" \
+     --description "<TASK_DESCRIPTION_WITH_TEMPLATE>" \
      --assignee ralph \
-     --labels "{{task.category}}"
+     --labels "<TASK_CATEGORY>"
    ```
+
+   **Important:** `bd create` does NOT perform any template substitution. The `<PLACEHOLDER>` values must be filled in by YOU before running the command. Whatever string you pass to `--description` is stored exactly as-is.
+
+   **How to construct `<TASK_DESCRIPTION_WITH_TEMPLATE>`:**
+   1. Copy the **Singular Task Description Template** structure below
+   2. Replace `<TASK_DESCRIPTION>` with the actual task description
+   3. Replace `<TASK_TEST_STEPS>` with the generated test steps for this task
+   4. Pass the entire constructed string to `--description`
 
    Notes for singular task mode:
 
    - Use `bd create` (not `bd mol pour`)
-   - The description should use the **Singular Task Description Template** (see below)
    - **Capture the bead ID** from output for the poured array
 
    ### Singular Task Description Template
 
-   For singular tasks, wrap the task description with execution instructions:
+   For singular tasks, wrap the task description with execution instructions. Fill in `<TASK_DESCRIPTION>` and `<TASK_TEST_STEPS>` with actual content before creating:
 
    ```markdown
    ## Task
-   {{task.description}}
+   <TASK_DESCRIPTION>
 
    ## Test Steps
-   {{task.test_steps}}
+   <TASK_TEST_STEPS>
 
    ## Execution
    Execute this task directly. When complete:
@@ -320,10 +338,18 @@ Spec task "User Authentication" with integration test steps might pour into:
 
 10. **Set priority on each root bead**:
     - After pouring, update each bead with its priority from the spec task
-    - Run: `bd update <bead-id> --priority {{task.priority}}`
+    - Run: `bd update <bead-id> --priority <TASK_PRIORITY>`
     - Priority values: 0-4 (0=critical, 1=high, 2=medium, 3=low, 4=backlog)
-11. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created bead IDs (see below)
-12. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
+11. **Verify assignees** (REQUIRED):
+    - After all sub-agents complete, verify that the poured tasks have the correct assignee
+    - For each bead ID captured in step 9, run: `bd show <bead-id>` and check the Assignee field
+    - If any poured tasks are missing the assignee, fix them immediately:
+      ```bash
+      bd update <bead-id> --assignee ralph
+      ```
+    - Report verification results to user: "Verified N tasks assigned to ralph (fixed M)"
+12. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created bead IDs (see below)
+13. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
 
 ## Error Recovery
 
@@ -422,7 +448,7 @@ Summary differs based on workflow mode:
 
 **For workflow formula mode:**
 
-- N tasks poured using {{formula}} formula
+- N tasks poured using <FORMULA_NAME> formula
 - Root bead IDs for each
 - Total beads created (tasks × formula steps)
 - Command to start: `./ralph.sh`
