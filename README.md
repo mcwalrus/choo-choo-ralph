@@ -6,6 +6,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple)
+![Status](https://img.shields.io/badge/status-experimental-orange)
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
@@ -15,6 +16,8 @@
 </p>
 
 <p align="center"><em>Relentless like a train. Persistent like Ralph Wiggum. Ships code while you sleep.</em></p>
+
+> **🧪 Experimental** — This workflow is being actively developed and tested on real projects. The approach works well for me: smaller, verified tasks trade higher Claude Code usage for more reliable outcomes. Your mileage may vary. I'd love feedback on what works and what doesn't.
 
 ---
 
