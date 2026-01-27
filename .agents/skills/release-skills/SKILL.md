@@ -18,7 +18,7 @@ Just run `/release-skills` - auto-detects your project configuration.
 | Node.js | package.json | ✓ |
 | Python | pyproject.toml | ✓ |
 | Rust | Cargo.toml | ✓ |
-| Claude Plugin | marketplace.json | ✓ |
+| Claude Plugin | marketplace.json + plugin.json | ✓ |
 | Generic | VERSION / version.txt | ✓ |
 
 ## Options
@@ -39,7 +39,7 @@ Just run `/release-skills` - auto-detects your project configuration.
    - `package.json` (Node.js)
    - `pyproject.toml` (Python)
    - `Cargo.toml` (Rust)
-   - `marketplace.json` or `.claude-plugin/marketplace.json` (Claude Plugin)
+   - `marketplace.json` or `.claude-plugin/marketplace.json` (Claude Plugin) - also update `plugin.json` or `.claude-plugin/plugin.json` if present
    - `VERSION` or `version.txt` (Generic)
 3. Scan for changelog files using glob patterns:
    - `CHANGELOG*.md`
@@ -279,7 +279,8 @@ git commit -m "docs(project): update architecture documentation"
 | package.json | `$.version` |
 | pyproject.toml | `project.version` |
 | Cargo.toml | `package.version` |
-| marketplace.json | `$.metadata.version` |
+| marketplace.json | `$.metadata.version` and `$.plugins[0].version` |
+| plugin.json | `$.version` |
 | VERSION / version.txt | Direct content |
 
 ### Step 8: User Confirmation
