@@ -44,7 +44,12 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
   claude --dangerously-skip-permissions --output-format stream-json --verbose -p "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 
-Decide which task to work on next. This should be the one YOU decide has the highest priority - not necessarily the first in the list.
+Also run \`bd list --status=in_progress --assignee=ralph\` to see what tasks other Ralph agents are currently working on.
+
+Decide which task to work on next. Selection criteria:
+1. Priority - higher priority tasks are more important
+2. Avoid conflicts - if other Ralph agents have tasks in_progress, you MUST pick a completely different epic. Do NOT work on any task that is a child, parent, or sibling of an in-progress task. Stay away from the entire epic tree that another Ralph is working on.
+3. If all high-priority epics are being worked on by other Ralphs, pick a lower-priority epic that is completely unrelated
 
 Pick ONE task, claim it with \`bd update <id> --status in_progress\`, then execute it according to its description.
 
