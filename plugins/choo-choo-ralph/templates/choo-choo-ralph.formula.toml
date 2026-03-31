@@ -86,6 +86,11 @@ description = "Task category: functional, style, infrastructure, or documentatio
 required = false
 default = "functional"
 
+[vars.project_type]
+description = "Project type: web, library, cli, or backend. Controls whether bearings runs a dev server and browser smoke test."
+required = false
+default = "web"
+
 [vars.auto_discovery]
 description = "Auto-create tasks for discovered gaps"
 default = "false"
@@ -134,8 +139,11 @@ description = """
 
 ## STEP 1: Health Check (MANDATORY)
 
-Before exploring for this task, verify the app is healthy:
+**Project type: {{project_type}}**
 
+Before exploring for this task, verify the app is healthy. Steps vary by project type:
+
+### For `web` projects (project_type=web):
 1. **Start dev server** (if not running) and verify it starts successfully
 2. **Run test suite** - Execute existing tests (check CLAUDE.md or package.json for commands)
 3. **Smoke test via dev-browser** - Navigate to the app and verify a core flow works
@@ -143,9 +151,14 @@ Before exploring for this task, verify the app is healthy:
    - Pick a completed feature from recent work
    - Verify it still functions correctly
 
+### For `library`, `cli`, or `backend` projects (project_type≠web):
+1. **Run test suite** - Execute existing tests (check CLAUDE.md or package.json for commands)
+2. **Build check** - Run the build command if available (e.g., `bun build`, `cargo build`, `go build`)
+3. **Skip** dev server and browser smoke test — they do not apply to this project type
+
 ### If Health Check FAILS
 
-If ANY of these fail, you CANNOT proceed with this task. Report back to orchestrator:
+If ANY applicable check fails, you CANNOT proceed with this task. Report back to orchestrator:
 
 1. **Identify the cause** - Check git log for recent changes:
    ```bash
@@ -175,6 +188,7 @@ Add a comment to THIS bead with your findings, then report to orchestrator.
 **If health checks passed**:
 ```
 STATUS: HEALTHY
+PROJECT_TYPE: {{project_type}}
 FILES: <key files that will be modified>
 PATTERNS: <existing patterns to follow>
 APPROACH: <recommended implementation approach>
@@ -186,7 +200,8 @@ ACTION: Close this step and proceed to implement.
 **If health checks failed**:
 ```
 STATUS: HEALTH_CHECK_FAILED
-FAILURE: <what failed - dev server, tests, smoke test>
+PROJECT_TYPE: {{project_type}}
+FAILURE: <what failed - tests, build, dev server, smoke test>
 ERROR: <error message or description>
 CAUSE: <likely cause from git log investigation>
 RELATED_EPIC: <bead-id from git log if found, or "unknown">
