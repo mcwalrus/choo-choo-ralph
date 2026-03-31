@@ -1,0 +1,305 @@
+formula = "formula-review"
+description = """
+# FORMULA REVIEW ORCHESTRATOR: Improving {{formula_name}} / {{step_name}}
+
+You coordinate prompt engineering improvements to a formula step.
+
+## Context
+- **Formula**: {{formula_name}}
+- **Step**: {{step_name}}
+- **Failure Pattern**: {{failure_summary}}
+
+## Execution Loop
+
+1. **Find ready steps**: `bd ready --parent <your-id>`
+2. **For each ready step**, route by assignee prefix:
+   - `ralph-subagent-*`: Spawn a Task agent with the step's description (from `bd show <step-id>`)
+   - `ralph-inline-*`: Execute the step yourself following its description
+3. **Read what each step reports** and follow its instructions exactly
+4. **Close completed steps**: `bd close <step-id>`
+5. **Repeat** until no more steps
+
+## Commands
+- Check ready children: `bd ready --parent <your-id>`
+- View step details: `bd show <step-id>`
+- Close completed step: `bd close <step-id>`
+- Add progress note: `bd comments add <step-id> "..."`
+
+## Following Step Instructions
+
+Each step will report back with:
+- A STATUS (e.g., GAP_FOUND, NO_GAP, DONE, PASS, FAIL)
+- Instructions for what you should do next
+
+**You must follow the step's instructions.** Steps may tell you to:
+- Proceed to the next step
+- Stop early (if no gap found)
+- Reopen a previous step with guidance
+- Mark yourself as blocked
+
+## Completion
+
+When all steps are done:
+
+1. **Add summary comment**:
+   ```bash
+   bd comments add <your-id> "[summary] Reviewed {{formula_name}}/{{step_name}}: <what changed or why no change>"
+   ```
+
+2. **Close yourself**: `bd close <your-id>`
+
+**IMPORTANT**: Complete this entire molecule (all applicable steps), then exit.
+
+Your ID is in the bead data you received.
+"""
+version = 1
+type = "workflow"
+
+[vars.formula_name]
+description = "Name of the formula to review (e.g. 'choo-choo-ralph', 'bug-fix')"
+required = true
+
+[vars.step_name]
+description = "Name of the step within the formula to improve (e.g. 'bearings', 'implement', 'verify')"
+required = true
+
+[vars.failure_summary]
+description = "Summary of the recurring failure pattern that prompted this review (from ralph-failures.sh output or observation)"
+required = true
+
+[[steps]]
+id = "analyze"
+title = "Analyze prompt gap in {{formula_name}}/{{step_name}}"
+assignee = "ralph-subagent-analyze"
+labels = ["ralph-step", "analyze"]
+description = """
+# ANALYZE PHASE
+
+## Goal
+Read the formula step prompt and identify exactly what's missing or misleading based on the observed failure pattern.
+
+## Context
+- **Formula**: {{formula_name}}
+- **Step**: {{step_name}}
+- **Failure Pattern**: {{failure_summary}}
+
+## Steps
+
+1. **Locate the formula file**:
+   - Check `.beads/formulas/{{formula_name}}.formula.toml`
+   - If not found, check `plugins/choo-choo-ralph/templates/{{formula_name}}.formula.toml`
+   - Read the full file
+
+2. **Find the target step**:
+   - Locate the `[[steps]]` block where `id = "{{step_name}}"`
+   - Read the step's `description` field carefully
+
+3. **Analyze the gap**:
+   - What does the failure pattern say agents did wrong?
+   - What instruction is missing, ambiguous, or misleading in the step prompt?
+   - What specific wording change would prevent this failure?
+   - Is this a missing instruction, a missing example, or a confusing edge case?
+
+4. **Document your findings**:
+   Add a comment to THIS bead:
+   ```bash
+   bd comments add <this-bead-id> "[analysis] Gap: <description of what's missing>. Location: <quote the relevant section>. Suggested fix: <specific wording>"
+   ```
+
+## Output to Orchestrator
+
+**If a clear prompt gap is identified**:
+```
+STATUS: GAP_FOUND
+FORMULA_FILE: <path to the formula file>
+STEP_ID: {{step_name}}
+GAP: <what is missing or misleading>
+LOCATION: <quote of the problematic section>
+SUGGESTION: <specific new wording or instruction to add>
+
+ACTION: Close this step and proceed to patch.
+```
+
+**If no actionable gap is found** (e.g. the failure was environmental, not a prompt issue):
+```
+STATUS: NO_GAP
+INVESTIGATION: <what you looked at>
+REASON: <why the prompt is not the cause of the failure>
+
+ACTION: You must handle this no-gap finding:
+1. Add comment: `bd comments add <root-id> "[no-gap] {{formula_name}}/{{step_name}} prompt looks correct. Failure cause: <reason>"`
+2. Close this step: `bd close <this-step-id>`
+3. Close the root: `bd close <root-id> --reason "No prompt gap found: <reason>"`
+4. Exit - do not continue with other steps
+```
+"""
+
+[[steps]]
+id = "patch"
+title = "Patch {{formula_name}}/{{step_name}} prompt"
+assignee = "ralph-subagent-patch"
+labels = ["ralph-step", "patch"]
+needs = ["analyze"]
+description = """
+# PATCH PHASE
+
+## Goal
+Apply a minimal, targeted edit to the formula step prompt to fix the identified gap.
+
+## Context
+- **Formula**: {{formula_name}}
+- **Step**: {{step_name}}
+- **Failure Pattern**: {{failure_summary}}
+
+## Steps
+
+1. **Review analysis findings**:
+   - Check the analyze step's comments: `bd comments <analyze-step-id>`
+   - Understand exactly what change is needed and where
+
+2. **Locate the formula file**:
+   - Primary: `.beads/formulas/{{formula_name}}.formula.toml`
+   - Mirror: `plugins/choo-choo-ralph/templates/{{formula_name}}.formula.toml`
+   - If both exist, you must patch BOTH files to keep them in sync
+
+3. **Apply a minimal edit**:
+   - Use the Edit tool for precise string replacement
+   - Change only the specific section identified in analyze
+   - Do NOT rewrite the whole step — minimal targeted change only
+   - Preserve TOML triple-quoted string formatting (opening/closing delimiters)
+   - Preserve surrounding whitespace and indentation
+
+4. **Patch guidelines**:
+   - Add a concrete instruction if the gap was a missing instruction
+   - Add a clarifying example if the gap was ambiguity
+   - Add an explicit edge case if the gap was an unhandled scenario
+   - Keep additions concise — one targeted paragraph or bullet
+
+## Output to Orchestrator
+
+Add a comment to THIS bead summarizing what was changed:
+```
+STATUS: DONE
+FILES_CHANGED: <list of files patched>
+CHANGE: <brief description of what was added/changed>
+BEFORE: <quoted original text>
+AFTER: <quoted new text>
+
+ACTION: Close this step and proceed to validate.
+```
+"""
+
+[[steps]]
+id = "validate"
+title = "Validate patched {{formula_name}} formula"
+assignee = "ralph-inline-validate"
+labels = ["ralph-step", "validate"]
+needs = ["patch"]
+description = """
+# VALIDATE PHASE
+
+## Goal
+Confirm the patched formula has valid TOML syntax and can be parsed by beads.
+
+## Steps
+
+1. **Check TOML syntax** on both files (if both exist):
+   ```bash
+   python3 -c "
+   import tomllib, sys
+   for f in ['.beads/formulas/{{formula_name}}.formula.toml',
+             'plugins/choo-choo-ralph/templates/{{formula_name}}.formula.toml']:
+       try:
+           with open(f, 'rb') as fp: tomllib.load(fp)
+           print(f'OK: {f}')
+       except FileNotFoundError:
+           print(f'SKIP (not found): {f}')
+       except Exception as e:
+           print(f'ERROR: {f}: {e}')
+           sys.exit(1)
+   "
+   ```
+
+2. **Dry-run the formula** to confirm beads can read it:
+   ```bash
+   bd --no-daemon mol pour {{formula_name}} --dry-run \
+     --var formula_name="test" \
+     --var step_name="test" \
+     --var failure_summary="test validation run" 2>&1 | head -20
+   ```
+   Note: This dry-run uses the CURRENT formula being validated. If the formula being
+   reviewed is NOT formula-review itself, adjust variables to match its required vars.
+
+3. **Read the patch section** one more time to confirm the change reads naturally
+   and doesn't break surrounding context.
+
+## If Validation FAILS
+
+If TOML syntax is invalid:
+1. Add comment: `bd comments add <root-id> "[validate-fail] TOML syntax error: <error message>"`
+2. Reopen patch step: `bd update <patch-step-id> --status open`
+3. Add guidance: `bd comments add <patch-step-id> "[REWORK] TOML syntax error after patch: <error>. Fix the syntax without changing the intent."`
+4. Close this validate step: `bd close <this-step-id>`
+5. Exit - wait for patch to rerun
+
+## Output to Orchestrator
+
+**If validation passes**:
+```
+STATUS: PASS
+TOML_SYNTAX: valid
+DRY_RUN: ok (or N/A with reason)
+
+ACTION: Close this step and proceed to commit.
+```
+
+**If validation fails**: follow the failure instructions above, then exit.
+"""
+
+[[steps]]
+id = "commit"
+title = "Commit {{formula_name}} formula patch"
+assignee = "ralph-inline-commit"
+labels = ["ralph-step", "commit"]
+needs = ["validate"]
+description = """
+# COMMIT PHASE
+
+## Goal
+Create a clean git commit for the formula patch.
+
+## Instructions
+
+1. **Review changes**: `git diff`
+2. **Stage only formula files**:
+   ```bash
+   git add .beads/formulas/{{formula_name}}.formula.toml
+   git add plugins/choo-choo-ralph/templates/{{formula_name}}.formula.toml 2>/dev/null || true
+   ```
+3. **Write commit message** using conventional commits:
+
+```
+docs(formula): improve {{formula_name}}/{{step_name}} prompt
+
+{{failure_summary}}
+
+Patch adds/clarifies: <one-line description of change>
+
+Refs: <this-bead-id>
+```
+
+4. **Create the commit**.
+
+## Output to Orchestrator
+
+Add a comment with the commit details:
+```
+STATUS: DONE
+COMMIT: <commit hash>
+MESSAGE: <commit message summary>
+
+ACTION: Close this step. All steps complete.
+```
+
+When complete, close this bead with `bd close <this-bead-id>`.
+"""
