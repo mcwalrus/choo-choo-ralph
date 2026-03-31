@@ -17,6 +17,13 @@ MAGENTA='\033[35m'
 GRAY='\033[90m'
 WHITE='\033[97m'
 
+# Pricing (USD per 1M tokens) — update when model changes
+# Source: https://www.anthropic.com/pricing (claude-sonnet-4-6 / Sonnet-class)
+PRICE_INPUT=3.00
+PRICE_OUTPUT=15.00
+PRICE_CACHE_READ=0.30
+PRICE_CACHE_CREATE=3.75
+
 # Track tokens for summary
 total_input=0
 total_output=0
@@ -197,13 +204,21 @@ while IFS= read -r line; do
     esac
 done
 
-# Show final summary if verbose and we processed tokens
-if $VERBOSE && [[ $total_output -gt 0 ]]; then
+# Show final cost summary whenever we processed tokens (always, not just verbose)
+if [[ $total_output -gt 0 ]]; then
     echo ""
     # Total input = input_tokens + cache_read + cache_create (input_tokens can be 0 when cached)
     actual_input=$((total_input + total_cache_read + total_cache_create))
     cache_pct=0
     [[ $actual_input -gt 0 ]] && cache_pct=$((total_cache_read * 100 / actual_input))
+    cost=$(awk -v inp="$total_input" -v out="$total_output" \
+               -v cr="$total_cache_read" -v cc="$total_cache_create" \
+               -v pi="$PRICE_INPUT" -v po="$PRICE_OUTPUT" \
+               -v pcr="$PRICE_CACHE_READ" -v pcc="$PRICE_CACHE_CREATE" \
+               'BEGIN { printf "%.4f", (inp/1e6)*pi + (out/1e6)*po + (cr/1e6)*pcr + (cc/1e6)*pcc }')
     echo -e "${DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-    echo -e "${DIM}📊 Total: $(format_number $actual_input) input, $(format_number $total_output) output, ${cache_pct}% cache hit${RESET}"
+    if $VERBOSE; then
+        echo -e "${DIM}📊 Tokens: $(format_number $actual_input) input, $(format_number $total_output) output, ${cache_pct}% cache hit${RESET}"
+    fi
+    echo -e "${DIM}💰 Cost:   ~\$${cost} USD${RESET}"
 fi
