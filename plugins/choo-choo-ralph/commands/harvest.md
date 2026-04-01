@@ -53,7 +53,8 @@ For each learning or gap bead, spawn a sub-agent (using Task tool) to:
    ```
 2. **Analyze modified files** - What files were touched? What patterns emerged?
 3. **Read the comments** - Parse `[bearings]`, `[implement]`, `[verify]`, `[summary]` comments for learnings and gaps
-4. **Form enriched summary** - Combine learning/gap with file context
+4. **Assess verification quality** - Check `[verify]` comments for depth and coverage, no news is good news
+5. **Form enriched summary** - Combine learning/gap with file context and verification quality.
 
 The sub-agent should return a structured summary:
 
@@ -121,6 +122,9 @@ Group similar learnings and determine the best artifact type:
 | Repeated workflow (e.g., "always do X when Y") | Skill            | `.claude/skills/<pattern>.md`  |
 | Critical project guidance                      | Root CLAUDE.md   | `CLAUDE.md`                    |
 | Folder-specific pattern                        | Folder CLAUDE.md | `<folder>/CLAUDE.md`           |
+| Weak verification pattern (recurring)          | Formula patch    | Formula verify step or gap     |
+
+If multiple tasks show the same verification weakness (e.g., UI tasks consistently missing browser checks), propose either a formula patch to make that check mandatory or a gap task to add the missing infrastructure.
 
 Skip learnings that are:
 
@@ -161,14 +165,17 @@ source_beads:
     title: "Add user settings"
     has_learnings: true
     has_gaps: false
+    verification_quality: strong
   - id: choo-def
     title: "Fix button styling"
     has_learnings: true
     has_gaps: true
+    verification_quality: adequate
   - id: choo-xyz
     title: "Add API tests"
     has_learnings: false
     has_gaps: true
+    verification_quality: weak
 gaps_to_review:
   - bead_id: choo-def
     gap: "Missing input validation for user API"
@@ -337,8 +344,9 @@ Gaps that were skipped due to existing coverage or other reasons:
 
 1. Review each proposed artifact above
 2. Review each gap and set action to `approved` or `rejected` in frontmatter
-3. Add comments in the "Review Notes" sections for changes
-4. Run `/harvest` again to refine or approve
+3. Review verification quality signals for recurring weak verification singals
+4. Add comments in the "Review Notes" sections for changes
+5. Run `/harvest` again to refine or approve
 ```
 
 ## Mode 2: Refine Plan Based on Comments
