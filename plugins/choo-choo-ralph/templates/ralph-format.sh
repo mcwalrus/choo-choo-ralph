@@ -190,16 +190,8 @@ while IFS= read -r line; do
             ;;
 
         result)
-            # Final result with token summary
             echo ""
             echo -e "${GREEN}${BOLD}✓ Done${RESET}"
-
-            if $VERBOSE && [[ $total_output -gt 0 ]]; then
-                actual_input=$((total_input + total_cache_read + total_cache_create))
-                cache_pct=0
-                [[ $actual_input -gt 0 ]] && cache_pct=$((total_cache_read * 100 / actual_input))
-                echo -e "${DIM}📊 Tokens: $(format_number $actual_input) in → $(format_number $total_output) out (cache: ${cache_pct}% hit)${RESET}"
-            fi
             ;;
     esac
 done

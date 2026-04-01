@@ -100,10 +100,10 @@ Options:
 
 **Example:**
 
-- Spec has X high-level tasks
-- Each spec task breaks down into Y-Z implementation tasks
-- Target: AZ-BZ implementation tasks (molecules)
-- Formula steps (N per molecule) are internal workflow, NOT part of task count
+- Spec has 10 high-level tasks
+- Each spec task breaks down into 5-10 implementation tasks
+- Target: 50-100 implementation tasks (molecules)
+- Formula steps (6 per molecule) are internal workflow, NOT part of task count
 
 ### Target Implementation Tasks
 
@@ -111,7 +111,7 @@ If `target_tasks` is provided (e.g., 80):
 
 - This is the target number of **implementation tasks (molecules)**, NOT spec tasks
 - Break down spec tasks to reach this target
-- A spec with X tasks targeting Y molecules = ~8 implementation tasks per spec task
+- A spec with 10 tasks targeting 80 molecules = ~8 implementation tasks per spec task
 
 ### Default Targets (Guidance)
 
@@ -119,11 +119,11 @@ If `target_tasks` is NOT provided, size tasks using your own judgment guided by 
 
 **Context is the constraint.** Claude Sonnet 4.6 has ~176K truly usable tokens, and performs best at 40-60% utilization (the "smart zone"). Each molecule is executed by a subagent with its own fresh ~156K context that gets garbage collected after. A task that fits cleanly in one subagent session — with room to spare — is the right size. A task that would bloat context past the smart zone is too large.
 
-**One task per loop, tight scope.** The main agent acts as a scheduler; expensivework happens in subagents. Tasks should be narrow enough that the subagent spendsits budget on the work itself, not on re-reading sprawling context to stay oriented.
+**One task per loop, tight scope.** The main agent acts as a scheduler; expensive work happens in subagents. Tasks should be narrow enough that the subagent spends its budget on the work itself, not on re-reading sprawling context to stay oriented.
 
 **Simplicity and brevity win.** Verbose task descriptions degrade agent determinism. If you can't describe the task in 1-2 sentences, it's probably too coarse. If the description needs a paragraph, split it.
 
-**Let the spec drive the count.** Don't manufacture sub-tasks to hit a number. Ifa spec task is already clear and independently verifiable, pour it as one molecule. Split only on natural seams — data model, API layer, UI, infrastructure — not artificially.
+**Let the spec drive the count.** Don't manufacture sub-tasks to hit a number. If a spec task is already clear and independently verifiable, pour it as one molecule. Split only on natural seams — data model, API layer, UI, infrastructure — not artificially.
 
 ### What Makes a Good Implementation Task
 
