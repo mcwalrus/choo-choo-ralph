@@ -117,11 +117,31 @@ If `target_tasks` is provided (e.g., 80):
 
 If `target_tasks` is NOT provided, use these defaults:
 
-| Project Type     | Target Molecules | Breakdown Ratio     |
+| Project Type     | Target Molecules | Per Spec Task       |
 | ---------------- | ---------------- | ------------------- |
-| Single feature   | 15-30 tasks      | ~5-10 per spec task |
-| Feature set      | 50-100 tasks     | ~5-8 per spec task  |
-| Full application | 150-300 tasks    | ~5-10 per spec task |
+| Single feature   | 3-8 tasks        | 1-3 per spec task   |
+| Feature set      | 10-25 tasks      | 1-3 per spec task   |
+| Full application | 30-80 tasks      | 1-3 per spec task   |
+
+### Breakdown Workflow
+
+Before generating the molecule list, follow this named workflow. These are inline workflow phases — do not invoke them as skills.
+
+#### creative-planner phase
+Plan your breakdown before committing to it:
+1. State what each spec task delivers as a user-visible outcome (one sentence)
+2. Identify the natural implementation boundary — where could you stop and have something that works?
+3. Assign 1-3 molecules per spec task; each molecule is one coherent commit
+4. Name any dependencies between molecules
+Exit: You have a written breakdown with molecule titles and descriptions. Proceed to creative-sentinel.
+
+#### creative-sentinel gate
+Gate your breakdown before pouring:
+- Does each molecule deliver a testable, user-visible slice? If not — merge or redefine.
+- Is any molecule too large for one session? If so — split at the clearest seam.
+- Does the molecule count stay within 1-3 per spec task? If not — justify the exception explicitly.
+GATE: CLEARED → proceed to pour.
+Not cleared → revise the breakdown (one revision pass only), then proceed regardless.
 
 ### What Makes a Good Implementation Task
 
@@ -195,8 +215,8 @@ Spec task "User Authentication" with integration test steps might pour into:
 3. **Select formula** (workflow formula mode only): Use provided, auto-select, or prompt (see "Formula Selection" above)
 4. **Parse spec tasks**: Extract high-level tasks from source
 5. **Break down into implementation tasks** (CRITICAL):
-   - Each spec task → multiple granular implementation tasks
-   - Target 5-10 implementation tasks per spec task
+   - Follow the Breakdown Workflow above (creative-planner → creative-sentinel)
+   - Target 1-3 implementation tasks per spec task
    - Each implementation task = one molecule (or singular task)
    - See "Task Granularity" section above for guidance
 6. **Read spec frontmatter variables** (workflow formula mode only): Extract optional fields for formula variables:
@@ -212,7 +232,7 @@ Spec task "User Authentication" with integration test steps might pour into:
    "Ready to pour tasks from spec."
 
    Spec tasks: 27
-   Implementation tasks: ~135 (after breakdown)
+   Implementation tasks: ~27-54 (after breakdown)
    Formula: choo-choo-ralph (6 workflow steps each)
 
    Options:

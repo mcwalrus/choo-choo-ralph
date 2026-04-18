@@ -242,11 +242,13 @@ Example flow:
 
 ## Granularity Guidelines
 
+Spec tasks are **feature-level** — each task describes a user-visible capability or deliverable. At pour time, each spec task becomes 1-3 implementation molecules. Write tasks at the scope that reflects this: if a task would become more than 3 molecules, it is too broad and should be split here.
+
 When `--target-tasks` is specified:
 
 - Each task should be independently verifiable
 - Tasks can have dependencies (expressed via order or explicit deps)
-- Better to have more granular tasks than fewer large ones
+- Aim for tasks that map to 1-3 implementation molecules at pour time — not file-level or layer-level splits
 
 ## Context Section
 

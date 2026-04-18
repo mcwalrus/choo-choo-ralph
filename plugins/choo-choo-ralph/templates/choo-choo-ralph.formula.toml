@@ -224,19 +224,62 @@ Make the code changes to implement the feature/fix.
 ## Task Context
 {{task}}
 
-## Instructions
+## Implementation Workflow
 
-1. **Review bearings notes** - Check the bearings step's comments for context
-2. **Make focused changes** - Implement one thing at a time
-3. **Follow existing patterns** - Match the codebase style
-4. **Keep changes minimal** - Don't refactor unrelated code
-5. **Add necessary tests** - If the codebase has tests, add relevant ones
+Check `{{category}}`:
+- If `infrastructure` → follow Track B below
+- All others (functional, style, documentation) → follow Track A below
 
-## Best Practices
+## Track A: creative-process Pipeline (functional / style / documentation)
+
+### creative-planner phase
+Before writing any code, plan your implementation:
+1. State what this task delivers in one sentence
+2. List the files that will change and why each one changes
+3. Sequence the changes — what order, what depends on what
+4. Identify any unknowns; resolve them before starting (check bearings notes, read relevant files)
+Exit: You have a written plan. Proceed to creative-sentinel.
+
+### creative-sentinel gate
+Gate your plan before coding:
+- Does this plan fit within one coherent commit? If not — scope it down.
+- Are there edge cases or missing cases the verify step will likely catch? Handle them now.
+- Is the approach consistent with patterns from bearings? If not — align it.
+GATE: CLEARED → proceed to Implementation.
+Not cleared → apply creative-crictic below, then re-sentinel once. Proceed after one round regardless.
+
+### creative-crictic (if sentinel not cleared)
+Find the 1-2 most important objections from sentinel. State them plainly. Apply them. Then proceed.
+Exit: Changes applied. Re-run creative-sentinel once.
+
+### creative-ideas (if stuck during implementation)
+If you hit an unexpected blocker mid-implementation:
+1. State the blocker precisely in one sentence
+2. Generate 3 alternative approaches
+3. Select the one most consistent with codebase patterns from bearings
+4. Proceed with that approach
+Exit: Approach selected. Continue implementation.
+
+### Implementation
+Execute your plan from the creative-planner phase.
 - Use Edit tool for modifications (not Write for existing files)
-- Preserve existing formatting and conventions
-- Add comments for complex logic
-- Consider edge cases
+- Follow existing patterns — match the codebase style
+- Keep changes minimal — don't refactor unrelated code
+- Add necessary tests — if the codebase has tests, add relevant ones
+
+### creative-crictic self-review (before reporting complete)
+Before adding your STATUS comment:
+1. Does the implementation match the plan from creative-planner?
+2. What would the verify step fail on? Fix those now.
+3. Are there gaps or edge cases not addressed?
+Exit: Issues found are fixed. Proceed to output.
+
+## Track B: Infrastructure Workflow (infrastructure category)
+
+1. Define the requirements precisely — what must be true when this is done?
+2. Implement against those requirements directly — no improvisation, no novelty
+3. Validate each requirement is met before proceeding — no assumption of success
+4. If a requirement cannot be met as defined, stop and document why before attempting alternatives
 
 ## Output to Orchestrator
 
@@ -245,7 +288,7 @@ Add a comment to THIS bead summarizing what was changed, then report to orchestr
 ```
 STATUS: DONE
 CHANGES: <files modified and what was changed>
-DECISIONS: <any implementation decisions made>
+DECISIONS: <any implementation decisions made, including creative-planner choices>
 VERIFY_NOTES: <anything the verify step should specifically check>
 
 ACTION: Close this step and proceed to verify.
