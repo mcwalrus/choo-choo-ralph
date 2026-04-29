@@ -118,9 +118,7 @@ If `target_tasks` is provided (e.g., 80):
 If `target_tasks` is NOT provided, size tasks using your own judgment guided by these principles:
 
 
-**Context is the constraint.** A single bead should be completable within one context window without degradation. Claude Sonnet 4.6 has ~176K truly usable tokens, and performs best at 40-60% utilization (the "smart zone"). Each molecule is executed by a subagent with its own fresh ~156K context that gets garbage collected after. A task that fits cleanly in one subagent session — with room to spare — is the right size. A task that would bloat context past the smart zone is too large.
-
-**One task per loop, tight scope.** The main agent acts as a scheduler; expensive work happens in subagents. Tasks should be narrow enough that the subagent spends its budget on the work itself, not on re-reading sprawling context to stay oriented.
+**Be ambitious with approach.** Agents should feel free to take on substantial, multi-file, multi-layer changes as a single task when they represent a coherent, testable slice. A "login form with validation" is not just the React component — it's the validation schema, the API call, the error handling, and the test together. Don't artificially split along file boundaries. Look for natural feature seams across the stack.
 
 **Simplicity and brevity win.** Verbose task descriptions degrade agent determinism. If you can't describe the task in 1-2 sentences, it's probably too coarse. If the description needs a paragraph, split it.
 

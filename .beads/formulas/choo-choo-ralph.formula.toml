@@ -46,20 +46,22 @@ Do exactly what the step tells you. The step knows its domain.
 
 When all steps are done:
 
-1. **Add summary comment**:
+1. **Call `/cover-your-tracks`** — Run the skill to ensure tests, type-checks, and any cleanup guards are in place.
+
+2. **Add summary comment**:
    ```bash
    bd comments add <your-id> "[summary] Completed: <brief description>"
    ```
 
-2. **Check for [GAP] comments** on yourself:
+3. **Check for [GAP] comments** on yourself:
    - Run `bd comments <your-id>` and look for `[GAP]` entries
    - If any exist AND no gap-review step ran, add label: `bd label add <your-id> gaps`
 
-3. **Check for [LEARNING] comments** on yourself:
+4. **Check for [LEARNING] comments** on yourself:
    - Look for `[LEARNING]` entries in your comments
    - If any exist AND no learning-capture step ran, add label: `bd label add <your-id> learnings`
 
-4. **Close yourself**: `bd close <your-id>`
+5. **Close yourself**: `bd close <your-id>`
 
 **IMPORTANT**: Complete this entire molecule (all applicable steps), then exit. Do NOT look for or grab another molecule after. This keeps changes small and commits atomic.
 
