@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bd --version)",
+      "Bash(claude --version)",
+      "Bash(jq --version)",
+      "Bash(bd init:*)",
+      "Bash(cp \"/Users/max.collier/.claude/plugins/marketplaces/choo-choo-ralph/plugins/choo-choo-ralph/templates/ralph.sh\" ./ralph.sh)",
+      "Bash(cp \"/Users/max.collier/.claude/plugins/marketplaces/choo-choo-ralph/plugins/choo-choo-ralph/templates/ralph-once.sh\" ./ralph-once.sh)",
+      "Bash(cp \"/Users/max.collier/.claude/plugins/marketplaces/choo-choo-ralph/plugins/choo-choo-ralph/templates/ralph-format.sh\" ./ralph-format.sh)",
+      "Bash(chmod +x ralph.sh ralph-once.sh ralph-format.sh)",
+      "Bash(mkdir -p .beads/formulas)",
+      "Bash(cp \"/Users/max.collier/.claude/plugins/marketplaces/choo-choo-ralph/plugins/choo-choo-ralph/templates/choo-choo-ralph.formula.toml\" .beads/formulas/)",
+      "Bash(cp \"/Users/max.collier/.claude/plugins/marketplaces/choo-choo-ralph/plugins/choo-choo-ralph/templates/bug-fix.formula.toml\" .beads/formulas/)",
+      "Bash(mkdir -p .choo-choo-ralph)",
+      "Bash(bd formula:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:ghuntley.com)"
+    ]
+  }
+}
