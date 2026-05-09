@@ -16,7 +16,7 @@ You coordinate child steps for this task.
 
 1. **Find ready steps**: `bd ready --parent <your-id>`
 2. **For each ready step**, route by assignee prefix:
-   - `ralph-subagent-*`: Spawn a Task agent with the step's description (from `bd show <step-id>`)
+   - `ralph-subagent-*`: Execute as a separate agent task with the step's description (from `bd show <step-id>`)
    - `ralph-inline-*`: Execute the step yourself following its description
 3. **Read what each step reports** and follow its instructions exactly
 4. **Close completed steps**: `bd close <step-id>`
@@ -46,20 +46,22 @@ Do exactly what the step tells you. The step knows its domain.
 
 When all steps are done:
 
-1. **Add summary comment**:
+1. **Call `/cover-your-tracks`** — Run the skill to ensure tests, type-checks, and any cleanup guards are in place.
+
+2. **Add summary comment**:
    ```bash
    bd comments add <your-id> "[summary] Completed: <brief description>"
    ```
 
-2. **Check for [GAP] comments** on yourself:
+3. **Check for [GAP] comments** on yourself:
    - Run `bd comments <your-id>` and look for `[GAP]` entries
    - If any exist AND no gap-review step ran, add label: `bd label add <your-id> gaps`
 
-3. **Check for [LEARNING] comments** on yourself:
+4. **Check for [LEARNING] comments** on yourself:
    - Look for `[LEARNING]` entries in your comments
    - If any exist AND no learning-capture step ran, add label: `bd label add <your-id> learnings`
 
-4. **Close yourself**: `bd close <your-id>`
+5. **Close yourself**: `bd close <your-id>`
 
 **IMPORTANT**: Complete this entire molecule (all applicable steps), then exit. Do NOT look for or grab another molecule after. This keeps changes small and commits atomic.
 
@@ -145,14 +147,14 @@ Before exploring for this task, verify the app is healthy. Steps vary by project
 
 ### For `web` projects (project_type=web):
 1. **Start dev server** (if not running) and verify it starts successfully
-2. **Run test suite** - Execute existing tests (check CLAUDE.md or package.json for commands)
+2. **Run test suite** - Execute existing tests (check AGENTS.md or package.json for commands)
 3. **Smoke test via dev-browser** - Navigate to the app and verify a core flow works
    - Use the /dev-browser skill
    - Pick a completed feature from recent work
    - Verify it still functions correctly
 
 ### For `library`, `cli`, or `backend` projects (project_type≠web):
-1. **Run test suite** - Execute existing tests (check CLAUDE.md or package.json for commands)
+1. **Run test suite** - Execute existing tests (check AGENTS.md or package.json for commands)
 2. **Build check** - Run the build command if available (e.g., `bun build`, `cargo build`, `go build`)
 3. **Skip** dev server and browser smoke test — they do not apply to this project type
 
@@ -286,7 +288,7 @@ Validate that the implementation works correctly through automated AND manual ve
 
 ## Automated Checks
 
-1. **Run type checking** - Check CLAUDE.md or package.json for commands (e.g., `bun typecheck`)
+1. **Run type checking** - Check AGENTS.md or package.json for commands (e.g., `bun typecheck`)
 2. **Run tests** - Execute test suite (e.g., `bun test`)
 3. **Run linting** - If available, run the linter
 
@@ -471,15 +473,15 @@ Review [LEARNING] comments and create/update skills.
 1. **Get orchestrator comments**: `bd comments <your-parent-id>`
 
 2. **For each [LEARNING] comment**:
-   - Search existing skills in `.claude/skills/`
+   - Search existing skills in `.agents/skills/` or `.pi/skills/`
    - If matching skill exists -> update that skill
    - If no match and substantial -> create new skill
-   - If minor/folder-specific -> create folder CLAUDE.md
+   - If minor/folder-specific -> create folder AGENTS.md
 
 3. **Add label**: `bd label add <orchestrator-id> learnings-harvested`
 
 ## Skill Priority
-Prefer: skill > folder CLAUDE.md > root CLAUDE.md (rarely)
+Prefer: skill > folder AGENTS.md > root AGENTS.md (rarely)
 
 Follow skill creation best practices from the skill-development skill.
 
@@ -487,7 +489,7 @@ Follow skill creation best practices from the skill-development skill.
 Add a comment summarizing:
 - How many learnings were found
 - What skills were created/updated
-- What folder CLAUDE.md files were updated
+- What folder AGENTS.md files were updated
 
 When complete, close this bead with `bd close <this-bead-id>`.
 """

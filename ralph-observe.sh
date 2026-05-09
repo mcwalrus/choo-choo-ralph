@@ -94,7 +94,7 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
   fi
 
   # Run one Ralph iteration
-  claude --dangerously-skip-permissions --output-format stream-json --verbose -p "
+  pi --mode json -p "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 
 Also run \`bd list --status=in_progress --assignee=ralph\` to see what tasks other Ralph agents are currently working on.

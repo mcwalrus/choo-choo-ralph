@@ -1,5 +1,5 @@
 ---
-description: Harvest learnings and gaps from completed Choo Choo Ralph tasks into docs, skills, or CLAUDE.md
+description: Harvest learnings and gaps from completed Choo Choo Ralph tasks into docs, skills, or AGENTS.md
 ---
 
 # Harvest Learnings and Gaps
@@ -23,8 +23,6 @@ Agents accumulate learnings as they work (gotchas, patterns, recommendations). T
 2. **Plan exists with review comments** - Refine plan based on comments
 3. **Plan exists, no comments** - Ask: regenerate or proceed to create artifacts?
 
-**Important**: Only ONE `harvest-plan.md` can exist at a time. Previous plans are archived after approval.
-
 ## Mode 1: Gather Learnings and Gaps
 
 ### Step 1: Query Beads with Learnings and Gaps
@@ -45,448 +43,82 @@ If no beads found in either query, report "No unharvested learnings or gaps foun
 
 ### Step 2: Enrich with Git Context
 
-For each learning or gap bead, spawn a sub-agent (using Task tool) to:
+For each learning or gap bead:
 
 1. **Get the bead's commit references** - Check comments for commit hashes or search git log:
    ```bash
    git log --grep="<bead-id>" --oneline
    ```
 2. **Analyze modified files** - What files were touched? What patterns emerged?
-3. **Read the comments** - Parse `[bearings]`, `[implement]`, `[verify]`, `[summary]` comments for learnings and gaps
-4. **Assess verification quality** - Check `[verify]` comments for depth and coverage, no news is good news
-5. **Form enriched summary** - Combine learning/gap with file context and verification quality.
-
-The sub-agent should return a structured summary:
-
-```json
-{
-  "bead_id": "choo-xxx",
-  "title": "Original task title",
-  "learnings": [
-    {
-      "source": "implement",
-      "raw": "shadcn Button requires forwardRef when wrapping",
-      "files_affected": ["src/components/ui/button.tsx"],
-      "enriched": "When wrapping shadcn Button component, always use forwardRef to preserve ref forwarding. Without this, parent components cannot access the underlying button element."
-    }
-  ],
-  "gaps": [
-    {
-      "source": "verify",
-      "raw": "Missing input validation for user API",
-      "files_affected": ["src/api/users.ts"],
-      "context": "Line 45 accepts user input without validation",
-      "severity": "medium"
-    }
-  ],
-  "recommendation": "Consider creating skill for shadcn component patterns"
-}
-```
+3. **Read the comments** - Parse `[bearings]`, `[implement]`, `[verify]`, `[summary]` comments
+4. **Form enriched summary** - Combine learning/gap with file context
 
 ### Step 3: Check Existing Documentation
 
-Before proposing new artifacts, scan for existing documentation:
-
-1. **CLAUDE.md files** - Root and folder-specific:
-
+1. **AGENTS.md files** - Root and folder-specific:
    ```bash
-   find . -name "CLAUDE.md" -o -name ".claude.md" 2>/dev/null
+   find . -name "AGENTS.md" 2>/dev/null
    ```
 
-   Read each and note what's already documented.
-
-2. **Skills** - Check for existing skills in `.claude/skills/`:
-
-   ```bash
-   ls -la .claude/skills/ 2>/dev/null || echo "No skills directory"
-   ```
-
-   Read skill files to understand what's covered.
+2. **Skills** - Check for existing skills in `.agents/skills/` or `.pi/skills/`
 
 3. **Docs folder** - Check for reference documentation:
    ```bash
    ls -la docs/ 2>/dev/null || echo "No docs directory"
    ```
 
-**Prefer modifying existing skills over creating fragmented new ones.** Skills should be specific to a pattern or technology.
-
 ### Step 4: Deduplicate and Categorize
-
-#### Learnings
 
 Group similar learnings and determine the best artifact type:
 
-| Learning Type                                  | Artifact         | Location                       |
-| ---------------------------------------------- | ---------------- | ------------------------------ |
-| Technology pattern (e.g., "how to use shadcn") | Reference doc    | `docs/<tech>.md`               |
-| Repeated workflow (e.g., "always do X when Y") | Skill            | `.claude/skills/<pattern>.md`  |
-| Critical project guidance                      | Root CLAUDE.md   | `CLAUDE.md`                    |
-| Folder-specific pattern                        | Folder CLAUDE.md | `<folder>/CLAUDE.md`           |
-| Weak verification pattern (recurring)          | Formula patch    | Formula verify step or gap     |
-
-If multiple tasks show the same verification weakness (e.g., UI tasks consistently missing browser checks), propose either a formula patch to make that check mandatory or a gap task to add the missing infrastructure.
-
-Skip learnings that are:
-
-- Already documented in existing files
-- Too specific to be useful for future work
-- Actually bugs/fixes (should be beads, not docs)
-
-#### Gaps
-
-For each gap, check if there's already an existing task that covers it:
-
-```bash
-bd search "<gap description keywords>"
-```
-
-Skip gaps that:
-
-- Already have an existing open bead covering the issue
-- Are too minor to warrant a task
-- Were already fixed in subsequent work
-
-### Step 5: Get Current Date
-
-Use bash to get an accurate timestamp (never hallucinate dates):
-
-```bash
-date +%Y-%m-%d
-```
-
-### Step 6: Generate Harvest Plan
-
-Create `.choo-choo-ralph/harvest-plan.md` with YAML frontmatter and markdown content:
-
-```markdown
----
-source_beads:
-  - id: choo-abc
-    title: "Add user settings"
-    has_learnings: true
-    has_gaps: false
-    verification_quality: strong
-  - id: choo-def
-    title: "Fix button styling"
-    has_learnings: true
-    has_gaps: true
-    verification_quality: adequate
-  - id: choo-xyz
-    title: "Add API tests"
-    has_learnings: false
-    has_gaps: true
-    verification_quality: weak
-gaps_to_review:
-  - bead_id: choo-def
-    gap: "Missing input validation for user API"
-    context: "See src/api/users.ts:45"
-    action: pending  # pending | approved | rejected
-  - bead_id: choo-xyz
-    gap: "No error handling for network failures"
-    context: "See src/api/client.ts:12"
-    action: pending
-skills_to_create:
-  - name: shadcn-components
-    location: .claude/skills/shadcn-components.md
-skills_to_modify:
-  - name: database-patterns
-    location: .claude/skills/database-patterns.md
-    additions:
-      - "connection pooling section"
-      - "query optimization tips"
-artifacts_to_update:
-  - CLAUDE.md
-  - tests/CLAUDE.md
-created: 2026-01-11
----
-
-# Harvest Plan
-
-Found N learnings from M completed tasks and G gaps to review. Proposing X new artifacts after deduplication.
-
-## Existing Documentation
-
-What was found during scan:
-
-- **CLAUDE.md** - Project setup, testing commands, core patterns
-- **docs/api.md** - API conventions
-- **.claude/skills/component-patterns.md** - React component guidelines
-
-## Gaps to Review
-
-Gaps identified during task execution that may need follow-up work.
-
-### 1. Missing input validation for user API
-
-**Source bead**: choo-def
-**Context**: src/api/users.ts:45 - no validation on user input
-**Severity**: medium
-
-#### Proposed Task
-
-**Title**: Add input validation for user API
-**Category**: infrastructure
-
-#### Existing Coverage Check
-
-<!-- List any existing beads that may cover this, or "None found" -->
-
-#### Review Notes
-
-<!--
-Set action to: approved | rejected
-Add your review comments here
--->
-
----
-
-### 2. No error handling for network failures
-
-**Source bead**: choo-xyz
-**Context**: src/api/client.ts:12 - network calls have no try/catch
-**Severity**: high
-
-#### Proposed Task
-
-**Title**: Add error handling for network failures in API client
-**Category**: infrastructure
-
-#### Existing Coverage Check
-
-<!-- List any existing beads that may cover this, or "None found" -->
-
-#### Review Notes
-
-<!--
-Set action to: approved | rejected
-Add your review comments here
--->
-
----
-
-## Proposed Artifacts
-
-### 1. Skill: shadcn-components
-
-**Location**: `.claude/skills/shadcn-components.md`
-**Trigger**: When working with shadcn UI components
-**Source beads**: choo-abc, choo-def
-
-#### Content Preview
-
-## shadcn Component Patterns
-
-### forwardRef Requirement
-Always wrap shadcn components with forwardRef...
-
-### Import Convention
-Import from the component barrel...
-
-#### Review Notes
-
-<!-- Add your review comments here -->
-
----
-
-### 2. CLAUDE.md Update: API Testing Requirements
-
-**Location**: `tests/CLAUDE.md`
-**Source beads**: choo-xyz
-
-#### Content Preview
-
-# Test Directory Guidelines
-
-## Environment Variables
-Tests require VITE_API_URL to be set...
-
-#### Review Notes
-
-<!-- Add your review comments here -->
-
----
-
-### 3. Reference Doc: Database Patterns
-
-**Location**: `docs/database.md`
-**Source beads**: choo-123, choo-456
-
-#### Content Preview
-
-# Database Patterns
-
-## Query Conventions
-...
-
-#### Review Notes
-
-<!-- Add your review comments here -->
-
----
-
-## Skipped Learnings
-
-Learnings that were deduplicated or deemed not worth documenting:
-
-| Bead | Learning | Reason |
-|------|----------|--------|
-| choo-zzz | Import from index.ts | Already covered in CLAUDE.md |
-
-## Skipped Gaps
-
-Gaps that were skipped due to existing coverage or other reasons:
-
-| Bead | Gap | Reason |
-|------|-----|--------|
-| choo-yyy | Missing tests for edge case | Already covered by choo-999 |
-
-## Next Steps
-
-1. Review each proposed artifact above
-2. Review each gap and set action to `approved` or `rejected` in frontmatter
-3. Review verification quality signals for recurring weak verification singals
-4. Add comments in the "Review Notes" sections for changes
-5. Run `/harvest` again to refine or approve
-```
+| Learning Type | Artifact | Location |
+|---|---|---|
+| Technology pattern | Reference doc | `docs/<tech>.md` |
+| Repeated workflow | Skill | `.agents/skills/<pattern>/SKILL.md` |
+| Critical project guidance | Root AGENTS.md | `AGENTS.md` |
+| Folder-specific pattern | Folder AGENTS.md | `<folder>/AGENTS.md` |
+
+### Step 5: Generate Harvest Plan
+
+Create `.choo-choo-ralph/harvest-plan.md` with proposed artifacts and gaps for review.
 
 ## Mode 2: Refine Plan Based on Comments
 
-When plan exists and has non-empty "Review Notes" sections:
-
-1. **Parse review comments** - Understand requested changes:
-   - "Don't create this skill, add to CLAUDE.md instead"
-   - "Combine these two artifacts"
-   - "More detail needed on X"
-   - "Skip this one"
-2. **Parse gap actions** - Check `gaps_to_review` in frontmatter:
-   - `approved` - Gap will be poured as a new task
-   - `rejected` - Gap will be skipped
-   - `pending` - Still needs review
-3. **Regenerate affected artifacts** based on feedback
-4. **Clear review sections** after processing
-5. **Update the plan** with revised content
+When plan exists and has review comments, process feedback and regenerate.
 
 ## Mode 3: Plan Exists, No Comments
 
-Ask user via AskUserQuestion:
-
-- A) Regenerate plan (re-scan for new learnings and gaps)
-- B) Proceed to create artifacts and pour approved gaps (approve current plan)
+Ask user:
+- A) Regenerate plan
+- B) Proceed to create artifacts and pour approved gaps
 - C) Cancel
 
 ## Creating Artifacts and Processing Gaps
 
-When user indicates approval (Mode 3 option B, or explicit request):
-
 ### For Each Approved Artifact
 
-1. **Skills** (in `.claude/skills/`):
+1. **Skills** (in `.agents/skills/` or `.pi/skills/`):
+   - Create directory with `SKILL.md` file following the Agent Skills standard
 
-   - Create `.claude/skills/` directory if needed
-   - Write `.claude/skills/<name>.md` with proper frontmatter:
-
-     ```markdown
-     ---
-     name: <Name>
-     description: <trigger description for when skill should activate>
-     version: 1.0.0
-     ---
-
-     <content>
-     ```
-
-2. **CLAUDE.md** updates:
-
-   - If root: Append to or create `CLAUDE.md`
-   - If folder: Create `<folder>/CLAUDE.md`
-   - Use clear section headers
+2. **AGENTS.md** updates:
+   - If root: Append to or create `AGENTS.md`
+   - If folder: Create `<folder>/AGENTS.md`
 
 3. **Reference Docs**:
-   - Create `docs/` directory if needed
-   - Write `docs/<name>.md`
+   - Create `docs/<name>.md`
 
 ### For Each Approved Gap
 
-1. **Check for existing coverage** - Search for existing tasks that may cover the gap:
-
+1. Pour new task using the choo-choo-ralph formula:
    ```bash
-   bd search "<gap keywords>"
+   bd mol pour choo-choo-ralph --var title="<gap title>" --var task="<gap description>" --assignee ralph
    ```
 
-   If an existing task covers the gap, skip creating a new one.
+2. Link to source bead with a comment
 
-2. **Pour new task** - Use the choo-choo-ralph formula to create a task:
+### After Creating Artifacts
 
-   ```bash
-   bd mol pour choo-choo-ralph --title "<gap title>" --description "<gap description with context>"
-   ```
-
-3. **Link to source bead** - Add a comment to the new task referencing the source:
-
-   ```bash
-   bd comments add <new-bead-id> "Gap identified from <source-bead-id>"
-   ```
-
-### After Creating Artifacts and Processing Gaps
-
-1. **Mark beads with learnings as learnings-harvested**:
-
-   ```bash
-   bd label add <bead-id> learnings-harvested
-   ```
-
-   Do this for all beads in `source_beads` that have `has_learnings: true`.
-
-2. **Mark beads with gaps as gaps-harvested**:
-
-   ```bash
-   bd label add <bead-id> gaps-harvested
-   ```
-
-   Do this for all beads in `source_beads` that have `has_gaps: true`.
-
-3. **Archive the harvest plan**:
-
-   Get the current date and archive:
-
-   ```bash
-   ARCHIVE_DATE=$(date +%Y-%m-%d)
-   mkdir -p .choo-choo-ralph/archive
-   mv .choo-choo-ralph/harvest-plan.md ".choo-choo-ralph/archive/harvest-plan-${ARCHIVE_DATE}.md"
-   ```
-
-   If a file with that date already exists, append a counter (e.g., `harvest-plan-2026-01-11-2.md`).
-
-4. **Report summary**:
-   - Artifacts created and their locations
-   - Tasks created for approved gaps
-   - Beads marked as learnings-harvested
-   - Beads marked as gaps-harvested
-   - Location of archived plan
-   - Suggestion to commit the new documentation
-
-## Output
-
-**For new plan:**
-
-- Location of harvest plan file
-- Number of learnings gathered
-- Number of gaps identified
-- Number of artifacts proposed
-- Instructions for reviewing
-
-**For refined plan:**
-
-- Summary of changes made
-- Number of artifacts modified
-- Number of gaps with updated status
-- Next step: review more or approve
-
-**For artifact creation and gap processing:**
-
-- List of created documentation files
-- List of created tasks for approved gaps
-- Beads marked as learnings-harvested
-- Beads marked as gaps-harvested
-- Archived plan location
-- Reminder to commit and push
+1. Mark beads with learnings label as `learnings-harvested`
+2. Mark beads with gaps label as `gaps-harvested`
+3. Archive the harvest plan to `.choo-choo-ralph/archive/`
+4. Report summary of created artifacts and processed gaps

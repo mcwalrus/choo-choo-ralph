@@ -50,24 +50,20 @@ Specs are stored as `.choo-choo-ralph/<name>.spec.md`. Each project can have mul
 
 When the target spec file doesn't exist:
 
-### Step 1: Gather Context (Parallel Sub-Agents)
+### Step 1: Gather Context
 
-Launch sub-agents in parallel to gather context before generating the spec. This keeps main context lean and speeds up research.
+1. Explore existing project structure and architecture
+2. Identify patterns, conventions, and coding standards
+3. Find relevant existing code the new feature will integrate with
+4. Note file organization, naming conventions, test patterns
+5. Identify existing utilities, components, or services to reuse
 
-**Sub-Agent 1: Codebase Exploration**
-- Explore existing project structure and architecture
-- Identify patterns, conventions, and coding standards
-- Find relevant existing code the new feature will integrate with
-- Note file organization, naming conventions, test patterns
-- Identify existing utilities, components, or services to reuse
-
-**Sub-Agent 2: Technology Research** (if plan mentions unfamiliar tech)
-- Research documentation for technologies not already in the codebase
+Research documentation for technologies not already in the codebase:
 - Fetch best practices, common patterns, gotchas
 - Look for integration examples with existing stack
 - Note any setup/configuration requirements
 
-Both sub-agents should return concise summaries (not full docs) that inform spec generation.
+Return concise summaries that inform spec generation.
 
 ### Step 2: Generate Spec
 
@@ -91,7 +87,6 @@ When spec exists and has non-empty `<review>` tags:
    - "Add more detail about X"
    - "Combine with task Y"
    - "Remove this, not needed"
-   - Comments from other AI agents
 3. **Regenerate affected tasks** based on feedback
 4. **Clear review tags** after processing (empty tags remain for future comments)
 
@@ -112,7 +107,7 @@ When spec exists but all `<review>` tags are empty:
 
 ## Review Comment Format
 
-Users (or other AI agents) can add comments in review tags:
+Users can add comments in review tags:
 
 ```xml
 <task id="auth" priority="1" category="functional">

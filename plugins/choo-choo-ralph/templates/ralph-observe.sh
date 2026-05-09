@@ -17,9 +17,6 @@ MAX_ITERATIONS=100
 VERBOSE_FLAG=""
 AUTO_APPROVE_AFTER=0  # 0 = never auto-approve
 
-# Check dependencies
-command -v jq >/dev/null || { echo "Error: jq is required but not installed." >&2; exit 1; }
-
 # Parse arguments
 for arg in "$@"; do
   case "$arg" in
@@ -43,7 +40,7 @@ echo "Starting Ralph observer loop (max $MAX_ITERATIONS iterations)"
 if [[ $AUTO_APPROVE_AFTER -gt 0 ]]; then
   echo "Auto-approve after $AUTO_APPROVE_AFTER consecutive successes"
 fi
-echo "Controls: [Y/Enter] approve  [n] skip  [q] quit  [s] switch to auto"
+echo "Controls: [y/Enter] approve  [n] skip  [q] quit  [s] switch to auto"
 echo ""
 
 while [ $iteration -lt $MAX_ITERATIONS ]; do
@@ -69,7 +66,7 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
   # Ask for approval unless in auto mode
   if ! $auto_mode; then
     while true; do
-      printf "Run iteration? [Y/n/q/s]: "
+      printf "Run iteration? [y/N/q/s]: "
       read -r response </dev/tty
       case "${response,,}" in
         y | "")
@@ -97,7 +94,7 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
   fi
 
   # Run one Ralph iteration
-  claude --dangerously-skip-permissions --output-format stream-json --verbose -p "
+  pi --mode json -p "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 
 Also run \`bd list --status=in_progress --assignee=ralph\` to see what tasks other Ralph agents are currently working on.

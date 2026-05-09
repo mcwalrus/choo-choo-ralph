@@ -97,32 +97,18 @@ Options:
 1. **Spec tasks** = High-level features/capabilities from the spec
 2. **Implementation tasks** = Granular, atomic units of work (molecules)
 3. **Formula steps** = Workflow phases within each task (bearings, implement, verify, commit) - these are NOT counted toward task granularity
+**Guidelines:**
+
+- *Simplicity and brevity win.* Verbose task descriptions degrade agent determinism. If you can't describe the task in 1-2 sentences, it's probably too coarse. If the description needs a paragraph, split it.
+
+- *Let the spec drive the count.* Don't manufacture sub-tasks to hit a number. If a spec task is already clear and independently verifiable, pour it as one molecule. Split only on natural seams — data model, API layer, UI, infrastructure — not artificially.
 
 **Example:**
 
 - Spec has 10 high-level tasks
 - Each spec task breaks down into 5-10 implementation tasks
 - Target: 50-100 implementation tasks (molecules)
-- Formula steps (6 per molecule) are internal workflow, NOT part of task count
-
-### Target Implementation Tasks
-
-If `target_tasks` is provided (e.g., 80):
-
-- This is the target number of **implementation tasks (molecules)**, NOT spec tasks
-- Break down spec tasks to reach this target
-- A spec with 10 tasks targeting 80 molecules = ~8 implementation tasks per spec task
-
-### Default Targets (Guidance)
-
-If `target_tasks` is NOT provided, size tasks using your own judgment guided by these principles:
-
-
-**Be ambitious with approach.** Agents should feel free to take on substantial, multi-file, multi-layer changes as a single task when they represent a coherent, testable slice. A "login form with validation" is not just the React component — it's the validation schema, the API call, the error handling, and the test together. Don't artificially split along file boundaries. Look for natural feature seams across the stack.
-
-**Simplicity and brevity win.** Verbose task descriptions degrade agent determinism. If you can't describe the task in 1-2 sentences, it's probably too coarse. If the description needs a paragraph, split it.
-
-**Let the spec drive the count.** Don't manufacture sub-tasks to hit a number. If a spec task is already clear and independently verifiable, pour it as one molecule. Split only on natural seams — data model, API layer, UI, infrastructure — not artificially.
+- Formula steps (6 per molecule) are internal workflow, NOT part of task count.
 
 ### What Makes a Good Implementation Task
 
@@ -153,60 +139,25 @@ Each implementation task (molecule) should be a **coherent slice of work**:
 
 **Key question:** Can this slice be implemented, committed, and tested as one coherent unit? If yes, it's the right size.
 
-## Test Step Generation
-
-When pouring spec tasks into beads, **generate granular test steps** for each bead:
-
-- **Spec-level test steps** = Integration guidance (kept for reference)
-- **Bead-level test steps** = Specific verification for this task (generated)
-
-### Test Step Complexity (Important)
-
-Use a **mix of test step complexity** based on the task:
-
-| Task Type        | Test Steps | Examples                                         |
-| ---------------- | ---------- | ------------------------------------------------ |
-| Simple/focused   | 2-5 steps  | Button styling, color theme, simple validation   |
-| Standard feature | 5-8 steps  | Form component, API endpoint, data display       |
-| Complex workflow | 10+ steps  | Multi-step flows, auth flows, payment processing |
-
-**Guideline**: At least 20% of tasks should have 10+ test steps (the complex ones need thorough verification).
-
-For each bead created, include test steps that:
-
-1. Are specific to what this bead implements
-2. Can be verified independently
-3. Include expected outcomes
-4. Match complexity to task importance
-
-**Example transformation:**
-
-Spec task "User Authentication" with integration test steps might pour into:
-
-- Bead: "Create login form component" → test steps for form rendering, input fields, button state
-- Bead: "Add form validation" → test steps for email format, password requirements, error messages
-- Bead: "Implement auth API endpoint" → test steps for successful login, invalid credentials, session creation
-
 ## Process
 
 1. **Determine source**: Spec file or conversation
 2. **Select workflow mode**: Ask user (see "Workflow Mode Selection" above):
    - If "Use workflow formula": proceed to step 3
    - If "Create singular tasks": skip to step 4 (no formula needed)
-3. **Select formula** (workflow formula mode only): Use provided, auto-select, or prompt (see "Formula Selection" above)
+3. **Select formula** (workflow formula mode only): Use provided, auto-select, or prompt
 4. **Parse spec tasks**: Extract high-level tasks from source
 5. **Break down into implementation tasks** (CRITICAL):
    - Each spec task → multiple granular implementation tasks
    - Target 5-10 implementation tasks per spec task
    - Each implementation task = one molecule (or singular task)
-   - See "Task Granularity" section above for guidance
 6. **Read spec frontmatter variables** (workflow formula mode only): Extract optional fields for formula variables:
    - `auto_discovery` (default: `false`) - Enable auto task creation from gaps
    - `auto_learnings` (default: `false`) - Enable auto skill creation from learnings
-7. **Generate test steps**: Create granular test steps for each implementation task (see Test Step Complexity above)
+7. **Generate test steps**: Create granular test steps for each implementation task
 8. **Confirm with user** (AskUserQuestion):
 
-   Present a summary and let user choose. The summary differs based on workflow mode:
+   Present a summary and let user choose:
 
    **For workflow formula mode:**
    ```
@@ -237,34 +188,16 @@ Spec task "User Authentication" with integration test steps might pour into:
    ```
 
    **If "Show task overview first":**
-
    - Save full breakdown to `.choo-choo-ralph/pour-preview.md`
-   - Include: task title, description snippet, category, priority, test step count
-   - Tell user: "Overview saved to .choo-choo-ralph/pour-preview.md - review and run /pour again when ready"
-   - Exit without pouring
-
-   **If "Cancel":** Exit without pouring
 
    **If "Pour all tasks":** Continue to step 9
 
-9. **Pour tasks using sub-agents** (for context preservation and speed):
-
-   - Group implementation tasks into batches of 10-15 tasks
-   - Launch 5-10 sub-agents in parallel, each handling one batch
-   - Each sub-agent runs the pour commands for its batch
-   - This keeps context lean and speeds up the pour process
+9. **Pour tasks**:
 
    > **⚠️ CRITICAL: Assignee Requirement**
-   >
-   > ALL poured tasks MUST include `--assignee ralph`. When instructing sub-agents, you MUST:
-   > 1. Include the **exact command** with `--assignee ralph` in the sub-agent prompt
-   > 2. Do NOT paraphrase or summarize the command - copy it exactly
-   > 3. The sub-agent does NOT have access to this file - it only knows what you tell it
-   >
-   > If tasks are created without `--assignee ralph`, they won't be picked up by the Ralph loop.
+   > ALL poured tasks MUST include `--assignee ralph`.
 
-   **For workflow formula mode**, each sub-agent runs:
-
+   **For workflow formula mode**, for each implementation task:
    ```bash
    bd --no-daemon mol pour <FORMULA_NAME> \
      --var title="<TASK_TITLE>" \
@@ -275,19 +208,13 @@ Spec task "User Authentication" with integration test steps might pour into:
      --assignee ralph
    ```
 
-   **Placeholder notation:** `<PLACEHOLDER>` values are filled in by YOU (the agent) before running the command. These are NOT processed by beads - you must substitute them with actual values. In contrast, `{{variable}}` in formula files IS processed by beads templating.
-
    Notes for formula mode:
-
    - Use `bd mol pour` (not `bd formula pour`)
    - Use `--var` for variables (not `--set`)
-   - `<TASK_DESCRIPTION>` should include the generated test steps appended to the description
-   - `<TASK_CATEGORY>` comes from the spec task's category attribute
-   - `<SPEC_AUTO_DISCOVERY>` and `<SPEC_AUTO_LEARNINGS>` come from spec frontmatter (default to `false`)
-   - **Capture the root bead ID** from each `bd mol pour` output for the poured array
+   - `<TASK_DESCRIPTION>` should include the generated test steps
+   - **Capture the root bead ID** from each `bd mol pour` output
 
-   **For singular task mode**, each sub-agent runs:
-
+   **For singular task mode**, for each implementation task:
    ```bash
    bd --no-daemon create "<TASK_TITLE>" \
      --description "<TASK_DESCRIPTION_WITH_TEMPLATE>" \
@@ -295,22 +222,7 @@ Spec task "User Authentication" with integration test steps might pour into:
      --labels "<TASK_CATEGORY>"
    ```
 
-   **Important:** `bd create` does NOT perform any template substitution. The `<PLACEHOLDER>` values must be filled in by YOU before running the command. Whatever string you pass to `--description` is stored exactly as-is.
-
-   **How to construct `<TASK_DESCRIPTION_WITH_TEMPLATE>`:**
-   1. Copy the **Singular Task Description Template** structure below
-   2. Replace `<TASK_DESCRIPTION>` with the actual task description
-   3. Replace `<TASK_TEST_STEPS>` with the generated test steps for this task
-   4. Pass the entire constructed string to `--description`
-
-   Notes for singular task mode:
-
-   - Use `bd create` (not `bd mol pour`)
-   - **Capture the bead ID** from output for the poured array
-
    ### Singular Task Description Template
-
-   For singular tasks, wrap the task description with execution instructions. Fill in `<TASK_DESCRIPTION>` and `<TASK_TEST_STEPS>` with actual content before creating:
 
    ```markdown
    ## Task
@@ -338,85 +250,38 @@ Spec task "User Authentication" with integration test steps might pour into:
    ```
 
 10. **Set priority on each root bead**:
-    - After pouring, update each bead with its priority from the spec task
     - Run: `bd update <bead-id> --priority <TASK_PRIORITY>`
     - Priority values: 0-4 (0=critical, 1=high, 2=medium, 3=low, 4=backlog)
+
 11. **Verify assignees** (REQUIRED):
-    - After all sub-agents complete, verify that the poured tasks have the correct assignee
-    - For each bead ID captured in step 9, run: `bd show <bead-id>` and check the Assignee field
-    - If any poured tasks are missing the assignee, fix them immediately:
-      ```bash
-      bd update <bead-id> --assignee ralph
-      ```
-    - Report verification results to user: "Verified N tasks assigned to ralph (fixed M)"
-12. **Update spec frontmatter**: After all tasks are poured successfully, update the spec's YAML frontmatter `poured` array with the created bead IDs (see below)
-13. **Archive spec**: Move spec to archive folder after all tasks poured (see below)
+    - For each bead ID, run: `bd show <bead-id>` and check the Assignee field
+    - Fix any missing assignees: `bd update <bead-id> --assignee ralph`
+    - Report: "Verified N tasks assigned to ralph (fixed M)"
+
+12. **Update spec frontmatter**: Update the `poured` array with created bead IDs
+
+13. **Archive spec**: Move spec to `.choo-choo-ralph/archive/` after all tasks poured
 
 ## Error Recovery
 
-If `bd mol pour` or `bd create` fails mid-way through multiple tasks:
+If `bd mol pour` or `bd create` fails mid-way:
 
 1. **Identify failed task**: Note which task failed and the error message
-2. **Rollback partial state**: Delete any orphaned beads created for the failed task: `bd delete <partial-bead-id>`
-3. **Report to user**:
-   - List successfully poured tasks
-   - Identify the failed task and error
-   - Suggest fix or ask user for guidance
-4. **Resume option**: User fixes the issue, then runs pour again (will re-pour all tasks since spec wasn't archived)
-
-## Updating Spec Frontmatter
-
-After all tasks are poured successfully, update the spec's YAML frontmatter with the bead IDs:
-
-1. **Collect bead IDs** from each `bd mol pour` or `bd create` command output
-2. **Update the `poured` array** in the frontmatter with all collected IDs
-
-**Example before pour:**
-
-```yaml
----
-title: "User Authentication"
-created: 2026-01-11
-poured: []
----
-```
-
-**Example after pour:**
-
-```yaml
----
-title: "User Authentication"
-created: 2026-01-11
-poured:
-  - proj-abc
-  - proj-def
-  - proj-ghi
----
-```
-
-This provides traceability from spec to beads, and allows querying which specs have been poured.
+2. **Rollback partial state**: Delete any orphaned beads: `bd delete <partial-bead-id>`
+3. **Report to user**: List successful tasks, identify failure, suggest fix
+4. **Resume option**: User fixes the issue, then runs pour again
 
 ## Spec Archiving
 
 After successfully pouring **all ready tasks** from a spec:
 
-1. **Create archive directory** if it doesn't exist: `.choo-choo-ralph/archive/`
-2. **Move the spec file** to archive:
-   - From: `.choo-choo-ralph/my-feature.spec.md`
-   - To: `.choo-choo-ralph/archive/my-feature.spec.md`
+1. **Create archive directory** if needed: `.choo-choo-ralph/archive/`
+2. **Move the spec file** to archive
 3. **Report**: "Spec archived to .choo-choo-ralph/archive/my-feature.spec.md"
-
-**When NOT to archive:**
-
-- If pour failed mid-way (spec stays in place for retry)
-- If some tasks still need refinement (have content in `<review>` tags)
-- If pouring from conversation (no spec file to archive)
-
-The archived spec serves as a record of what was planned and poured, with bead IDs for traceability.
 
 ## Handling Review Comments
 
-If any tasks have content in `<review>` tags, use **AskUserQuestion** to let the user decide:
+If tasks have content in `<review>` tags, use **AskUserQuestion**:
 
 ```
 "Some tasks have review comments that haven't been processed."
@@ -427,35 +292,14 @@ Options:
 - Cancel - Stop and let me review the spec manually
 ```
 
-**If user chooses "Run /spec first":**
-
-- Run the spec command to process review feedback
-- After spec completes, continue with pour
-
-**If user chooses "Ignore and pour all":**
-
-- Clear all review tags (treat as empty)
-- Pour all tasks
-- Archive spec
-
-**If user chooses "Cancel":**
-
-- Report spec location for manual review
-- Exit without pouring
-
 ## Output
 
-Summary differs based on workflow mode:
-
 **For workflow formula mode:**
-
 - N tasks poured using <FORMULA_NAME> formula
 - Root bead IDs for each
-- Total beads created (tasks × formula steps)
 - Command to start: `./ralph.sh`
 
 **For singular task mode:**
-
 - N singular tasks created
 - Bead IDs for each
 - Command to start: `./ralph.sh`

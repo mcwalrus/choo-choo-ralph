@@ -40,8 +40,8 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
   echo "$available ready task(s) available"
   echo ""
 
-  # Let Claude see available work, pick one, claim it, and execute
-  claude --dangerously-skip-permissions --output-format stream-json --verbose -p "
+  # Let the agent see available work, pick one, claim it, and execute
+  pi --mode json -p "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 
 Also run \`bd list --status=in_progress --assignee=ralph\` to see what tasks other Ralph agents are currently working on.

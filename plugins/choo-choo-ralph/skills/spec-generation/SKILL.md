@@ -88,11 +88,10 @@ auto_learnings: false
   </context>
 
   <!-- Optional: For greenfield projects -->
-
-<technology_stack>
-<frontend>React, Tailwind</frontend>
-<backend>Node.js, SQLite</backend>
-</technology_stack>
+  <technology_stack>
+    <frontend>React, Tailwind</frontend>
+    <backend>Node.js, SQLite</backend>
+  </technology_stack>
 
   <!-- Core content: Tasks to implement -->
   <tasks>
@@ -108,12 +107,12 @@ auto_learnings: false
         - Set up build configuration
       </steps>
       <test_steps>
-        1. Run `npm install` or `bun install` - verify no errors
+        1. Run install command - verify no errors
         2. Run build command - verify successful build
         3. Run dev server - verify it starts without errors
       </test_steps>
       <review>
-        <!-- User comments here -->
+        <!-- Review comments here -->
       </review>
     </task>
 
@@ -132,7 +131,7 @@ auto_learnings: false
         1. Navigate to the feature location
         2. Perform the main user action
         3. Verify expected behavior occurs
-        4. Check for console errors
+        4. Check for errors
         5. Test edge cases
       </test_steps>
       <review></review>
@@ -141,9 +140,11 @@ auto_learnings: false
   </tasks>
 
   <!-- Optional: Success criteria -->
-
-<success_criteria> - Feature works as described - Tests pass - No regressions
-</success_criteria>
+  <success_criteria>
+    - Feature works as described
+    - Tests pass
+    - No regressions
+  </success_criteria>
 </project_specification>
 ```
 
@@ -189,68 +190,43 @@ auto_learnings: false
 ### Full Application (30+ tasks)
 
 Include technology_stack, database_schema, api_endpoints, implementation_steps sections.
-See `references/anthropic-spec-format.md` for complete example.
 
 ## Task State
 
 Task state is determined by the `<review>` tag:
 
-| State                | How to identify            | Action                                |
-| -------------------- | -------------------------- | ------------------------------------- |
+| State | How to identify | Action |
+|---|---|---|
 | **Needs refinement** | `<review>` tag has content | Run `/spec` again to process feedback |
-| **Ready to pour**    | `<review>` tag is empty    | Can be poured into beads              |
-| **Rejected**         | Task deleted from spec     | N/A                                   |
-
-This keeps the workflow simple:
-
-- Add feedback in `<review>` tags → run `/spec` to refine
-- Clear `<review>` tags (or leave empty) → ready for `/pour`
-- Delete tasks you don't want
-- After pouring, spec is archived
+| **Ready to pour** | `<review>` tag is empty | Can be poured into beads |
+| **Rejected** | Task deleted from spec | N/A |
 
 ## Priority Levels
 
-| Priority | Meaning             |
-| -------- | ------------------- |
-| 0        | Critical - do first |
-| 1        | High                |
-| 2        | Medium (default)    |
-| 3        | Low                 |
-| 4        | Backlog             |
+| Priority | Meaning |
+|---|---|
+| 0 | Critical - do first |
+| 1 | High |
+| 2 | Medium (default) |
+| 3 | Low |
+| 4 | Backlog |
 
 ## Category Types
 
-| Category         | Description                           |
-| ---------------- | ------------------------------------- |
-| `functional`     | Core features, business logic         |
-| `style`          | Visual polish, animations, UI tweaks  |
+| Category | Description |
+|---|---|
+| `functional` | Core features, business logic |
+| `style` | Visual polish, animations, UI tweaks |
 | `infrastructure` | Build, deploy, tooling, project setup |
-| `documentation`  | README, comments, docs                |
+| `documentation` | README, comments, docs |
 
-Categories help prioritize work - functional tasks typically come before style tasks.
+## Test Steps
 
-## Test Steps (Integration Guidance)
-
-The `<test_steps>` section in the spec provides **integration-level test guidance** for the feature as a whole. These are high-level verification steps that test the complete user flow.
-
-**Important**: When the spec is poured into beads, the pour process generates **granular test steps** for each individual bead. The spec-level test steps guide the overall integration testing, while bead-level test steps verify the specific implementation.
-
-Example flow:
-
-- **Spec task**: "User Authentication" with test steps for complete login flow
-- **Poured beads**: "Create login form", "Add validation", "Implement API endpoint" - each with their own granular test steps
-
-## Granularity Guidelines
-
-When `--target-tasks` is specified:
-
-- Each task should be independently verifiable
-- Tasks can have dependencies (expressed via order or explicit deps)
-- Better to have more granular tasks than fewer large ones
+The `<test_steps>` section in the spec provides **integration-level test guidance** for the feature as a whole. When the spec is poured into beads, the pour process generates granular test steps for each individual bead.
 
 ## Context Section
 
-The `<context>` section is populated by the `/spec` command using sub-agents that research the codebase and technologies before generating the spec. This ensures tasks are informed by the actual codebase.
+The `<context>` section provides research findings about the codebase and technologies:
 
 | Section | Purpose | Example |
 |---------|---------|---------|
@@ -258,11 +234,3 @@ The `<context>` section is populated by the `/spec` command using sub-agents tha
 | `integration_points` | Files/services to integrate with | "Extends UserService in src/services/user.ts" |
 | `new_technologies` | Research notes for new tech | "Stripe: Use webhook verification for security" |
 | `conventions` | Naming, testing, style conventions | "Tests colocated with source (*.test.ts)" |
-
-**For greenfield projects**: Context section may be minimal or empty, but should still include technology research if using unfamiliar tech.
-
-**For existing codebases**: Context section should be thorough - tasks reference patterns and integration points to ensure consistency.
-
-## Additional Resources
-
-See `references/anthropic-spec-format.md` for the full specification format based on Anthropic's autonomous coding research.

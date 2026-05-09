@@ -7,7 +7,7 @@ Specs are markdown files with XML-like tags that define tasks for the Choo Choo 
 ### Why XML-like Tags?
 
 1. **Clear boundaries** - Task boundaries are explicit, no details leak across tasks
-2. **AI-friendly** - Claude understands hierarchical structure naturally
+2. **AI-friendly** - Coding agents understand hierarchical structure naturally
 3. **Human-readable** - Easy to edit in any text editor
 4. **Git-friendly** - Diffs are clear and meaningful
 

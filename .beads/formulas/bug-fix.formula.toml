@@ -14,7 +14,7 @@ This bug may be related to: {{related_epic}}
 
 1. **Find ready steps**: `bd ready --parent <your-id>`
 2. **For each ready step**, route by assignee prefix:
-   - `ralph-subagent-*`: Spawn a Task agent with the step's description (from `bd show <step-id>`)
+   - `ralph-subagent-*`: Execute as a separate agent task with the step's description (from `bd show <step-id>`)
    - `ralph-inline-*`: Execute the step yourself following its description
 3. **Read what each step reports** and follow its instructions exactly
 4. **Close completed steps**: `bd close <step-id>`
@@ -131,7 +131,7 @@ ACTION: You must handle this non-reproducible bug:
 If you discovered something noteworthy, add a comment to the ROOT/PARENT bead (not this step):
 - A pattern that led to this bug
 - A missing test that would have caught it
-- Something that should be in CLAUDE.md but isn't
+- Something that should be in AGENTS.md but isn't
 
 Use: `bd comments add <root-id> "[diagnose] <your learning>"`
 

@@ -17,8 +17,8 @@ fi
 echo "$available open task(s) available"
 echo ""
 
-# Run Claude interactively - let it see available work and pick one
-claude "
+# Run pi interactively - let it see available work and pick one
+pi "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 
 Decide which task to work on next. This should be the one YOU decide has the highest priority - not necessarily the first in the list.
