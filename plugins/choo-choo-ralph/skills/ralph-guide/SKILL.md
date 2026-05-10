@@ -1,5 +1,5 @@
 ---
-name: Ralph Guide
+name: ralph-guide
 description: Guidance for customizing Ralph workflows, formulas, learning capture, and troubleshooting. Use for questions about Ralph loop, formulas, harvesting learnings, or running multiple Ralphs.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: Spec Generation
+name: spec-generation
 description: Generate structured spec files for Choo Choo Ralph. Use when running /choo-choo-ralph:spec or creating task breakdowns.
 ---
 

@@ -9,8 +9,12 @@
   "pi": {
     "extensions": [],
     "skills": [
+      "./plugins/choo-choo-ralph/skills/install",
+      "./plugins/choo-choo-ralph/skills/spec",
       "./plugins/choo-choo-ralph/skills/spec-generation",
-      "./plugins/choo-choo-ralph/skills/ralph-guide"
+      "./plugins/choo-choo-ralph/skills/ralph-guide",
+      "./plugins/choo-choo-ralph/skills/harvest",
+      "./.agents/skills/release-skills"
     ],
     "prompts": [],
     "themes": []
