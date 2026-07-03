@@ -2,19 +2,21 @@
 
 Complete reference for all Choo Choo Ralph commands with options and examples.
 
-## /choo-choo-ralph:install
+## /install
 
 Set up Choo Choo Ralph in your project by copying local, customizable files. These files are yours to modify—see [Customization Guide](./customization.md) for details.
+
+> `install` is a skill (auto-invoked, or ask the agent to "install choo-choo-ralph"), the others below are prompt templates invoked directly with `/name`.
 
 ### Usage
 
 ```
-/choo-choo-ralph:install
+/install
 ```
 
 ### What It Does
 
-1. **Checks prerequisites** - Verifies bd (beads), claude, and jq are installed
+1. **Checks prerequisites** - Verifies bd (beads), pi, and jq are installed
 2. **Initializes beads** - Runs `bd init` if .beads directory doesn't exist
 3. **Copies shell scripts** - ralph.sh, ralph-once.sh, ralph-format.sh to project root
 4. **Copies formulas** - choo-choo-ralph and bug-fix formula templates to `.beads/formulas/`
@@ -35,14 +37,14 @@ All these files are yours to modify. See [Customization Guide](./customization.m
 
 ---
 
-## /choo-choo-ralph:spec
+## /spec
 
 Generate or refine a spec file from a plan or conversation context.
 
 ### Usage
 
 ```
-/choo-choo-ralph:spec [source-file] [spec-name]
+/spec [source-file] [spec-name]
 ```
 
 ### Arguments
@@ -64,38 +66,38 @@ The command operates in three modes based on current state:
 
 **Generate from plan file:**
 ```
-/choo-choo-ralph:spec docs/feature-plan.md auth-system
+/spec docs/feature-plan.md auth-system
 ```
 
 **Auto-detect spec name from conversation:**
 ```
-/choo-choo-ralph:spec
+/spec
 ```
 After discussing a feature, the spec name is inferred from context.
 
 **Work with existing spec:**
 ```
-/choo-choo-ralph:spec
+/spec
 ```
 If `.choo-choo-ralph/auth-system.spec.md` exists, offers to refine or regenerate.
 
 **Refine after review:**
 ```
 # Add feedback in <review> tags, then:
-/choo-choo-ralph:spec
+/spec
 ```
 Tasks with content in `<review>` tags trigger refinement mode.
 
 ---
 
-## /choo-choo-ralph:pour
+## /pour
 
 Convert spec tasks into beads (issues) for Ralph to work on.
 
 ### Usage
 
 ```
-/choo-choo-ralph:pour [target-tasks] [spec-file] [formula]
+/pour [target-tasks] [spec-file] [formula]
 ```
 
 ### Arguments
@@ -129,34 +131,34 @@ The preview option is useful for reviewing how spec tasks will be granularized b
 
 **Pour all tasks from current spec:**
 ```
-/choo-choo-ralph:pour
+/pour
 ```
 
 **Pour specific number of tasks:**
 ```
-/choo-choo-ralph:pour 5
+/pour 5
 ```
 
 **Pour from specific spec with formula:**
 ```
-/choo-choo-ralph:pour 8 .choo-choo-ralph/auth-system.spec.md choo-choo-ralph
+/pour 8 .choo-choo-ralph/auth-system.spec.md choo-choo-ralph
 ```
 
 **Pour using bug-fix formula:**
 ```
-/choo-choo-ralph:pour 3 .choo-choo-ralph/fixes.spec.md bug-fix
+/pour 3 .choo-choo-ralph/fixes.spec.md bug-fix
 ```
 
 ---
 
-## /choo-choo-ralph:harvest
+## /harvest
 
 Extract learnings from completed tasks into documentation, skills, or CLAUDE.md.
 
 ### Usage
 
 ```
-/choo-choo-ralph:harvest
+/harvest
 ```
 
 ### Modes
@@ -176,7 +178,7 @@ Extract learnings from completed tasks into documentation, skills, or CLAUDE.md.
 
 ### Harvest Workflow
 
-1. Run `/choo-choo-ralph:harvest`
+1. Run `/harvest`
 2. Review generated harvest plan
 3. Add comments for refinement (optional)
 4. Run again to refine or execute
@@ -294,10 +296,10 @@ bd show <bead-id> --deps
 
 | Command | Purpose |
 |---------|---------|
-| `/choo-choo-ralph:install` | Set up Ralph in project |
-| `/choo-choo-ralph:spec` | Generate/refine spec file |
-| `/choo-choo-ralph:pour` | Create beads from spec |
-| `/choo-choo-ralph:harvest` | Extract learnings |
+| `/install` | Set up Ralph in project |
+| `/spec` | Generate/refine spec file |
+| `/pour` | Create beads from spec |
+| `/harvest` | Extract learnings |
 | `./ralph.sh` | Run Ralph loop |
 | `./ralph-once.sh` | Run single task |
 | `bd ready --assignee ralph` | See queued tasks |

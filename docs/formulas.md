@@ -354,7 +354,7 @@ bd comments add {{root_bead_id}} "[GAP] <title> - <description>"
 """
 ```
 
-Learnings and gaps can later be harvested using `/choo-choo-ralph:harvest`.
+Learnings and gaps can later be harvested using `/harvest`.
 
 ## Labels Used by Ralph
 

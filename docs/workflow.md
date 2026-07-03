@@ -37,7 +37,7 @@ Planning can take many forms:
 - **Bullet points** - Quick notes about what you want to build
 - **PRDs (Product Requirements Documents)** - Formal specifications
 - **Design documents** - Technical architecture decisions
-- **Conversations with Claude** - Interactive brainstorming sessions
+- **Conversations with the agent** - Interactive brainstorming sessions
 - **Sketches and mockups** - Visual representations of the goal
 - **Existing issues or tickets** - From your project management tool
 
@@ -142,7 +142,7 @@ A spec transforms your rough plan into a structured, reviewable list of tasks. S
 Spec accepts two optional positional arguments:
 
 ```bash
-/choo-choo-ralph:spec [source-file] [spec-name]
+/spec [source-file] [spec-name]
 ```
 
 | Argument | Description |
@@ -152,9 +152,9 @@ Spec accepts two optional positional arguments:
 
 **Examples:**
 ```bash
-/choo-choo-ralph:spec plans/user-auth.md         # Generate from plan file
-/choo-choo-ralph:spec plans/feature.md my-feature # With explicit spec name
-/choo-choo-ralph:spec                            # Generate from conversation context
+/spec plans/user-auth.md         # Generate from plan file
+/spec plans/feature.md my-feature # With explicit spec name
+/spec                            # Generate from conversation context
 ```
 
 Specs are stored at `.choo-choo-ralph/{spec-name}.spec.md`.
@@ -268,7 +268,7 @@ Also add: should return JWT token, not just user object
 </task>
 ```
 
-3. **Run `/choo-choo-ralph:spec` again** - Claude reads your review tags and updates the spec
+3. **Run `/spec` again** - The agent reads your review tags and updates the spec
 
 4. **Repeat until all review tags are empty** - The spec is ready when you have no more feedback
 
@@ -362,7 +362,7 @@ The pour process:
 ### Running Pour
 
 ```bash
-/choo-choo-ralph:pour
+/pour
 ```
 
 Pour will prompt you to select a spec if multiple exist, or use the most recent one.
@@ -422,7 +422,7 @@ Use singular tasks when:
 Pour accepts three optional positional arguments:
 
 ```bash
-/choo-choo-ralph:pour [target-tasks] [spec-file] [formula]
+/pour [target-tasks] [spec-file] [formula]
 ```
 
 | Argument       | Description                                     |
@@ -434,10 +434,10 @@ Pour accepts three optional positional arguments:
 **Examples:**
 
 ```bash
-/choo-choo-ralph:pour                    # Auto-detect everything, prompt for options
-/choo-choo-ralph:pour 80                 # Target 80 implementation tasks
-/choo-choo-ralph:pour 80 my-feature      # 80 tasks from my-feature spec
-/choo-choo-ralph:pour 80 my-feature choo-choo-ralph  # With specific formula
+/pour                    # Auto-detect everything, prompt for options
+/pour 80                 # Target 80 implementation tasks
+/pour 80 my-feature      # 80 tasks from my-feature spec
+/pour 80 my-feature choo-choo-ralph  # With specific formula
 ```
 
 ### Interactive Prompts
@@ -458,7 +458,7 @@ The preview shows:
 - Category and priority
 - Test step count
 
-Review the preview file in your editor. If the breakdown looks wrong—tasks too big, too small, missing steps, or unclear—go back and refine your spec before pouring. Once you're satisfied, run `/choo-choo-ralph:pour` again and choose "Pour all tasks".
+Review the preview file in your editor. If the breakdown looks wrong—tasks too big, too small, missing steps, or unclear—go back and refine your spec before pouring. Once you're satisfied, run `/pour` again and choose "Pour all tasks".
 
 ### What Happens After Pour
 
@@ -577,7 +577,7 @@ Ralph includes a formatted output display so you can watch what's happening.
 
 #### Verbose Mode Adds
 
-- 🧠 Thinking blocks (shows Claude's reasoning)
+- 🧠 Thinking blocks (shows the agent's reasoning)
 - Full bash commands (wrapped nicely, not truncated)
 - Up to 10 lines of tool output (vs 1 line in normal mode)
 - Full error messages with context
@@ -662,14 +662,14 @@ Harvesting transforms these comments into permanent improvements.
 ### Running Harvest
 
 ```bash
-/choo-choo-ralph:harvest
+/harvest
 ```
 
 ### The Three-Phase Process
 
 #### Phase 1: Generate Harvest Plan
 
-Claude scans completed tasks, extracts learnings and gaps, and creates a plan:
+The agent scans completed tasks, extracts learnings and gaps, and creates a plan:
 
 ```
 Created harvest plan at .choo-choo-ralph/harvest-plan.md
@@ -720,17 +720,17 @@ Edit the harvest plan:
 - Check/uncheck learnings to include or exclude
 - Modify suggested skill/doc content
 - Set gap actions to `approved` (create task) or `rejected` (skip)
-- Add comments for Claude
+- Add comments for the agent
 
 Then run harvest again:
 
 ```bash
-/choo-choo-ralph:harvest
+/harvest
 ```
 
 #### Phase 3: Apply Changes
 
-Claude reads your reviewed plan and:
+The agent reads your reviewed plan and:
 
 - Updates CLAUDE.md with approved learnings
 - Creates new skills for patterns
@@ -872,22 +872,22 @@ For detailed information on formulas and parallel execution, see [formulas.md](.
 | Step        | Who      | Command                        | Output                                              |
 | ----------- | -------- | ------------------------------ | --------------------------------------------------- |
 | **Plan**    | You      | (manual)                       | Plan document with goals, requirements, constraints |
-| **Spec**    | You + AI | `/choo-choo-ralph:spec`        | Structured task list in `.choo-choo-ralph/`         |
+| **Spec**    | You + AI | `/spec`        | Structured task list in `.choo-choo-ralph/`         |
 | **Review**  | You      | Edit spec with `<review>` tags | Refined spec with clear, sized tasks                |
-| **Pour**    | AI       | `/choo-choo-ralph:pour`        | Beads tasks ready for execution                     |
+| **Pour**    | AI       | `/pour`        | Beads tasks ready for execution                     |
 | **Ralph**   | AI       | `./ralph.sh`                   | Working code with atomic commits                    |
-| **Harvest** | You + AI | `/choo-choo-ralph:harvest`     | Updated skills, docs, CLAUDE.md                     |
+| **Harvest** | You + AI | `/harvest`     | Updated skills, docs, CLAUDE.md                     |
 
 ### Quick Start Checklist
 
 - [ ] Create a plan document with clear requirements
-- [ ] Run `/choo-choo-ralph:spec` to generate spec
+- [ ] Run `/spec` to generate spec
 - [ ] Review spec thoroughly, add `<review>` feedback
 - [ ] Iterate on spec until all review tags empty
-- [ ] Run `/choo-choo-ralph:pour` to create beads
+- [ ] Run `/pour` to create beads
 - [ ] Test with `./ralph-once.sh`
 - [ ] Run `./ralph.sh` for full execution
-- [ ] Run `/choo-choo-ralph:harvest` after completion
+- [ ] Run `/harvest` after completion
 - [ ] Review and approve harvest plan
 - [ ] Commit harvested learnings
 

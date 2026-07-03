@@ -27,7 +27,7 @@ See `../../../../docs/workflow.md` for the complete guide.
 ## Prerequisites & Safety
 
 **Required:**
-- [Claude Code](https://claude.com/claude-code) - Anthropic's CLI
+- [pi](https://pi.dev) - The coding agent harness this package targets
 - [Beads](https://github.com/steveyegge/beads) - Git-backed issue tracker (`bd` command)
 - [jq](https://jqlang.github.io/jq/) - JSON parsing
 
@@ -158,7 +158,7 @@ while [ $iteration -lt $MAX_ITERATIONS ]; do
     available=$(bd list --status=open --assignee=ralph --json | jq -r 'length')
     [ "$available" -eq 0 ] && exit 0
 
-    claude --dangerously-skip-permissions --output-format stream-json -p "
+    pi --mode json -p "
       Run bd list --status=open --assignee=ralph to see available tasks.
       Pick one, claim with bd update <id> --status in_progress, then execute.
     " | ./ralph-format.sh
@@ -314,7 +314,7 @@ All installed files are yours to modify.
 
 **ralph.sh customization points:**
 - `MAX_ITERATIONS=100` - Default iteration limit
-- The prompt passed to `claude -p` - Add project-specific guidance
+- The prompt passed to `pi -p` - Add project-specific guidance
 - Task sorting: `--sort=priority` vs `--sort=created`
 
 **ralph-format.sh:**

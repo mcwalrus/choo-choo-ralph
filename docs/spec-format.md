@@ -7,7 +7,7 @@ Specs are markdown files with XML-like tags that define tasks for the Choo Choo 
 ### Why XML-like Tags?
 
 1. **Clear boundaries** - Task boundaries are explicit, no details leak across tasks
-2. **AI-friendly** - Claude understands hierarchical structure naturally
+2. **AI-friendly** - The agent understands hierarchical structure naturally
 3. **Human-readable** - Easy to edit in any text editor
 4. **Git-friendly** - Diffs are clear and meaningful
 
@@ -153,7 +153,7 @@ Edit the spec file directly and add comments inside review tags:
 
 ### Processing Feedback
 
-Run `/choo-choo-ralph:spec` again. The AI will:
+Run `/spec` again. The AI will:
 
 1. Parse all feedback in review tags
 2. Modify tasks according to the feedback

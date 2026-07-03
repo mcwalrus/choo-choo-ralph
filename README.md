@@ -5,7 +5,6 @@
 </p>
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple)
 ![pi.dev](https://img.shields.io/badge/pi.dev-Package-blue)
 ![Status](https://img.shields.io/badge/status-experimental-orange)
 
@@ -18,13 +17,15 @@
 
 <p align="center"><em>Relentless like a train. Persistent like Ralph Wiggum. Ships code while you sleep.</em></p>
 
-> **🧪 Experimental** — This workflow is actively tested on real projects. Smaller, verified tasks trade higher Claude Code usage for more reliable outcomes. Your mileage may vary—I'd love feedback on what works and what doesn't.
+> **🧪 Experimental** — This workflow is actively tested on real projects. Smaller, verified tasks trade higher agent usage for more reliable outcomes. Your mileage may vary—I'd love feedback on what works and what doesn't.
+>
+> **Built for [pi](https://pi.dev).** This is a pi.dev package, not a Claude Code plugin — it does not target or depend on Claude Code.
 
 ---
 
 ## What is Choo Choo Ralph?
 
-A [Claude Code](https://claude.com/claude-code) plugin — also installable as a [pi.dev](https://pi.dev) package — that turns your plans into autonomous, verified work—designed for teams, not just side projects.
+A [pi.dev](https://pi.dev) package that turns your plans into autonomous, verified work—designed for teams, not just side projects.
 
 Most Ralph implementations use GitHub Issues (latency), scattered markdown files (messy), or monolithic JSON (doesn't scale). Choo Choo Ralph uses [Beads](https://github.com/steveyegge/beads)—a git-native task tracker where every task has an ID, workflows have real dependencies, and everything syncs through git the way your team already works.
 
@@ -66,7 +67,7 @@ Most Ralph implementations use GitHub Issues (latency), scattered markdown files
 <details>
 <summary>⚠️ <strong>Safety Warning</strong> — Read before running</summary>
 
-Ralph runs its coding agent non-interactively (Claude Code with `--dangerously-skip-permissions`, or pi in `-p`/print mode), which allows it to execute commands without confirmation. This is powerful but risky.
+Ralph runs `pi` non-interactively in `-p`/print mode, which allows it to execute commands without confirmation. This is powerful but risky.
 
 **We strongly recommend:**
 - Run in a **Docker container** or **VM**
@@ -78,29 +79,7 @@ By using this project, you accept full responsibility for any consequences.
 
 </details>
 
-**Prerequisites:** [Beads](https://github.com/steveyegge/beads) (`bd` command), [jq](https://jqlang.github.io/jq/), and either [Claude Code](https://claude.com/claude-code) or [pi](https://pi.dev)
-
-**Via Claude Code:**
-
-```bash
-# Install plugin
-/plugin marketplace add mj-meyer/choo-choo-ralph
-/plugin install choo-choo-ralph@choo-choo-ralph
-
-# Set up project
-/choo-choo-ralph:install
-
-# Generate spec from your plan
-/choo-choo-ralph:spec plans/my-feature.md
-
-# Review the spec, then pour into beads
-/choo-choo-ralph:pour
-
-# Start the loop
-./ralph.sh
-```
-
-**Via pi:**
+**Prerequisites:** [Beads](https://github.com/steveyegge/beads) (`bd` command), [jq](https://jqlang.github.io/jq/), and [pi](https://pi.dev)
 
 ```bash
 # Install package (see "Installing for pi" below for global vs local)
@@ -143,7 +122,7 @@ Either way, `pi list` shows what's currently installed and where, and `pi remove
 
 Most autonomous coding setups fall into two traps:
 
-1. **Too simple** — Run Claude in a loop, hope for the best, watch it spiral when something breaks
+1. **Too simple** — Run an agent in a loop, hope for the best, watch it spiral when something breaks
 2. **Too complex** — Build elaborate orchestration that's harder to debug than the code it writes
 
 And most Ralph implementations work fine for side projects but break down for teams. GitHub Issues introduce API latency. Scattered markdown files don't scale. Big JSON files or progress trackers get clunky when multiple people are involved.
@@ -190,13 +169,13 @@ Iteration 4: New agent benefits from skills → Works faster → Discovers more
 4. **Compound** — Future iterations benefit from accumulated knowledge
 5. **Repeat** — The system gets smarter with every session
 
-Run `/choo-choo-ralph:harvest` after a session to gather learnings and propose documentation artifacts.
+Run `/harvest` after a session to gather learnings and propose documentation artifacts.
 
 ---
 
 ## Customization
 
-When you run `/choo-choo-ralph:install`, you get local copies of everything—shell scripts, formulas, and config. These are yours to modify.
+When you install (see "Installing for pi" above), you get local copies of everything—shell scripts, formulas, and config. These are yours to modify.
 
 This is intentional. We didn't want a CLI with hardcoded decisions. We wanted best practices as a starting point that you can adapt per-project. One project might need tweaked prompts; another works fine with defaults.
 
@@ -239,8 +218,8 @@ For details, see [docs/customization.md](docs/customization.md).
 
 **Tools**
 - [Beads](https://github.com/steveyegge/beads) — Git-backed issue tracker with molecules
-- [dev-browser](https://github.com/SawyerHood/dev-browser) — Browser automation for Claude Code
-- [Claude Code](https://claude.com/claude-code) — Anthropic's CLI for agentic coding
+- [dev-browser](https://github.com/SawyerHood/dev-browser) — Browser automation for agentic coding
+- [pi](https://pi.dev) — The coding agent harness this package targets
 
 ## License
 

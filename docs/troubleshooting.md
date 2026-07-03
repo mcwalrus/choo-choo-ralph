@@ -254,7 +254,7 @@ If pour fails mid-way through creating beads:
 2. Fix the issue that caused pour to fail
 3. Run pour again:
    ```bash
-   /choo-choo-ralph:pour
+   /pour
    ```
 
 Pour is idempotent - it tracks created beads in the `poured` array and won't duplicate them.
@@ -275,7 +275,7 @@ If beads are in an inconsistent state:
 
 3. Re-pour from the spec:
    ```bash
-   /choo-choo-ralph:pour
+   /pour
    ```
 
 ### Starting Over (Re-pouring a Spec)
@@ -307,7 +307,7 @@ poured: []
 
 **Step 4: Re-pour**
 ```bash
-/choo-choo-ralph:pour
+/pour
 ```
 
 **Note:** If the original plan no longer exists, the archived spec still contains all task definitions and can be re-poured.
@@ -327,7 +327,7 @@ If Ralph's commits cause problems:
 
 ### Session Recovery
 
-If a Claude Code session ends unexpectedly mid-task:
+If a pi session ends unexpectedly mid-task:
 
 1. Check what task was in progress:
    ```bash

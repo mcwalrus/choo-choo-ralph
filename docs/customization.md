@@ -1,6 +1,6 @@
 # Customization Guide
 
-When you run `/choo-choo-ralph:install`, you get local copies of shell scripts and formulas in your project. These aren't just configuration—they're yours to modify.
+When you run `/install`, you get local copies of shell scripts and formulas in your project. These aren't just configuration—they're yours to modify.
 
 ## Why Local Copies?
 
@@ -31,8 +31,8 @@ The main loop that runs Ralph until tasks are done or a limit is reached.
 # Default iteration limit (line 9)
 MAX_ITERATIONS=100
 
-# The prompt Claude receives (line 44)
-claude --dangerously-skip-permissions ... -p "
+# The prompt pi receives (line 44)
+pi --mode json -p "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 ..."
 ```
@@ -45,7 +45,7 @@ Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 | Different task sorting | Change `--sort=priority` to `--sort=created` |
 | Limit visible tasks | Change `-n 100` to `-n 10` |
 | Add logging | Add `echo` statements or redirect output |
-| Change the prompt | Edit the heredoc passed to `claude -p` |
+| Change the prompt | Edit the heredoc passed to `pi -p` |
 
 **Example: Add pre-run health check**
 
@@ -61,12 +61,12 @@ Runs exactly one iteration, useful for testing before a long run. Same structure
 
 **When to customize:**
 - Add debugging output
-- Run interactively (it doesn't use `--dangerously-skip-permissions`)
+- Run interactively (it invokes `pi` without `--mode json`, so you see normal interactive output)
 - Test prompt changes before putting them in `ralph.sh`
 
 ### ralph-format.sh
 
-Parses Claude's JSON output stream and formats it for the terminal.
+Parses pi's `--mode json` event stream and formats it for the terminal.
 
 **Key customization points:**
 
@@ -219,15 +219,15 @@ When the plugin updates, your local copies don't change automatically. This is i
 
 **To get new features:**
 
-1. Check the plugin's changelog for what changed
+1. Check the package's changelog for what changed
 2. Manually merge changes into your local files, or
-3. Re-run `/choo-choo-ralph:install` and choose "Overwrite" for specific files
+3. Re-run the install skill and choose "Overwrite" for specific files
 
 **To see differences:**
 
 ```bash
-# Compare your ralph.sh with the plugin's template
-diff ralph.sh ~/.claude/plugins/choo-choo-ralph/templates/ralph.sh
+# Compare your ralph.sh with the package's template
+diff ralph.sh ~/.pi/agent/git/github.com/mcwalrus/choo-choo-ralph/plugins/choo-choo-ralph/skills/install/templates/ralph.sh
 ```
 
 **Recommended approach:**
@@ -248,13 +248,13 @@ MAX_ITERATIONS=200
 
 ### Moderate: Customize the Prompt
 
-The prompt in `ralph.sh` tells Claude how to pick and execute tasks. You might customize it to:
+The prompt in `ralph.sh` tells the agent how to pick and execute tasks. You might customize it to:
 
 **Add project-specific guidance:**
 
 ```bash
 # ralph.sh, edit the prompt (around line 44)
-claude --dangerously-skip-permissions --output-format stream-json --verbose -p "
+pi --mode json -p "
 Run \`bd ready --assignee=ralph -n 100 --sort=priority\` to see available tasks.
 
 Pick ONE task, claim it with \`bd update <id> --status in_progress\`, then execute it.
@@ -270,7 +270,7 @@ After the task is done, EXIT immediately.
 
 ```bash
 # Only work on tasks with a specific label
-claude ... -p "
+pi --mode json -p "
 Run \`bd ready --assignee=ralph --label=frontend\` to see available tasks.
 ..."
 ```
@@ -279,7 +279,7 @@ Run \`bd ready --assignee=ralph --label=frontend\` to see available tasks.
 
 ```bash
 # Work oldest tasks first instead of by priority
-claude ... -p "
+pi --mode json -p "
 Run \`bd ready --assignee=ralph --sort=created\` to see available tasks.
 
 Pick the OLDEST task (first in the list) to ensure nothing gets stuck.
@@ -319,7 +319,7 @@ required = true
 
 This creates a single bead with no children—Ralph executes it directly.
 
-Once your formula is in `.beads/formulas/`, it appears as an option when you run `/choo-choo-ralph:pour`. The pour command handles mapping your spec tasks to the formula's variables automatically.
+Once your formula is in `.beads/formulas/`, it appears as an option when you run `/pour`. The pour command handles mapping your spec tasks to the formula's variables automatically.
 
 You can also pour manually for one-off tasks:
 ```bash
