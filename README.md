@@ -6,6 +6,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple)
+![pi.dev](https://img.shields.io/badge/pi.dev-Package-blue)
 ![Status](https://img.shields.io/badge/status-experimental-orange)
 
 <p align="center">
@@ -23,7 +24,7 @@
 
 ## What is Choo Choo Ralph?
 
-A [Claude Code](https://claude.com/claude-code) plugin that turns your plans into autonomous, verified work—designed for teams, not just side projects.
+A [Claude Code](https://claude.com/claude-code) plugin — also installable as a [pi.dev](https://pi.dev) package — that turns your plans into autonomous, verified work—designed for teams, not just side projects.
 
 Most Ralph implementations use GitHub Issues (latency), scattered markdown files (messy), or monolithic JSON (doesn't scale). Choo Choo Ralph uses [Beads](https://github.com/steveyegge/beads)—a git-native task tracker where every task has an ID, workflows have real dependencies, and everything syncs through git the way your team already works.
 
@@ -65,7 +66,7 @@ Most Ralph implementations use GitHub Issues (latency), scattered markdown files
 <details>
 <summary>⚠️ <strong>Safety Warning</strong> — Read before running</summary>
 
-Ralph runs Claude with `--dangerously-skip-permissions`, which allows it to execute commands without confirmation. This is powerful but risky.
+Ralph runs its coding agent non-interactively (Claude Code with `--dangerously-skip-permissions`, or pi in `-p`/print mode), which allows it to execute commands without confirmation. This is powerful but risky.
 
 **We strongly recommend:**
 - Run in a **Docker container** or **VM**
@@ -77,7 +78,9 @@ By using this project, you accept full responsibility for any consequences.
 
 </details>
 
-**Prerequisites:** [Claude Code](https://claude.com/claude-code), [Beads](https://github.com/steveyegge/beads) (`bd` command), [jq](https://jqlang.github.io/jq/)
+**Prerequisites:** [Beads](https://github.com/steveyegge/beads) (`bd` command), [jq](https://jqlang.github.io/jq/), and either [Claude Code](https://claude.com/claude-code) or [pi](https://pi.dev)
+
+**Via Claude Code:**
 
 ```bash
 # Install plugin
@@ -97,7 +100,42 @@ By using this project, you accept full responsibility for any consequences.
 ./ralph.sh
 ```
 
+**Via pi:**
+
+```bash
+# Install package (see "Installing for pi" below for global vs local)
+pi install git:github.com/mcwalrus/choo-choo-ralph
+
+# Set up project (invokes the install skill)
+pi -p "install choo-choo-ralph in this project"
+
+# Generate spec from your plan
+pi -p "/spec plans/my-feature.md"
+
+# Review the spec, then pour into beads
+pi -p "/pour"
+
+# Start the loop
+./ralph.sh
+```
+
 For the complete workflow, see [docs/workflow.md](docs/workflow.md).
+
+### Installing for pi
+
+`pi install` supports two scopes — pick based on whether you want Ralph everywhere or just in one repo.
+
+| | Global | Local (`-l` / `--local`) |
+|---|---|---|
+| **Command** | `pi install git:github.com/mcwalrus/choo-choo-ralph` | `pi install git:github.com/mcwalrus/choo-choo-ralph -l` |
+| **Registered in** | `~/.pi/agent/settings.json` | `./.pi/settings.json` (project) |
+| **Available in** | Every project you run `pi` in | Only this repo |
+| **Good for** | Your own machine, personal workflow | Teams — commit `.pi/settings.json` so every contributor gets the same skills/prompts automatically |
+| **Collisions** | Shadowed by any project-local package with the same skill/prompt name (project scope always wins) | None — scoped to the repo |
+| **Trust** | Installed explicitly by you once | Other contributors must approve project-local packages the first time (`pi install -a` / `--approve`), since a checked-in `.pi/settings.json` can point at arbitrary code |
+| **Updating** | `pi update git:github.com/mcwalrus/choo-choo-ralph` on your machine | Same command, but per-clone — everyone updates independently unless you re-commit a version bump |
+
+Either way, `pi list` shows what's currently installed and where, and `pi remove <source>` (add `-l` for the local copy) uninstalls it.
 
 ---
 
