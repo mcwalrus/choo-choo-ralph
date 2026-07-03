@@ -94,10 +94,10 @@ Before proposing new artifacts, scan for existing documentation:
 
    Read each and note what's already documented.
 
-2. **Skills** - Check for existing skills in `.claude/skills/`:
+2. **Skills** - Check for existing skills in `.pi/skills/`:
 
    ```bash
-   ls -la .claude/skills/ 2>/dev/null || echo "No skills directory"
+   ls -la .pi/skills/ 2>/dev/null || echo "No skills directory"
    ```
 
    Read skill files to understand what's covered.
@@ -118,7 +118,7 @@ Group similar learnings and determine the best artifact type:
 | Learning Type                                  | Artifact         | Location                       |
 | ---------------------------------------------- | ---------------- | ------------------------------ |
 | Technology pattern (e.g., "how to use shadcn") | Reference doc    | `docs/<tech>.md`               |
-| Repeated workflow (e.g., "always do X when Y") | Skill            | `.claude/skills/<pattern>.md`  |
+| Repeated workflow (e.g., "always do X when Y") | Skill            | `.pi/skills/<pattern>.md`  |
 | Critical project guidance                      | Root CLAUDE.md   | `CLAUDE.md`                    |
 | Folder-specific pattern                        | Folder CLAUDE.md | `<folder>/CLAUDE.md`           |
 
@@ -180,10 +180,10 @@ gaps_to_review:
     action: pending
 skills_to_create:
   - name: shadcn-components
-    location: .claude/skills/shadcn-components.md
+    location: .pi/skills/shadcn-components.md
 skills_to_modify:
   - name: database-patterns
-    location: .claude/skills/database-patterns.md
+    location: .pi/skills/database-patterns.md
     additions:
       - "connection pooling section"
       - "query optimization tips"
@@ -203,7 +203,7 @@ What was found during scan:
 
 - **CLAUDE.md** - Project setup, testing commands, core patterns
 - **docs/api.md** - API conventions
-- **.claude/skills/component-patterns.md** - React component guidelines
+- **.pi/skills/component-patterns.md** - React component guidelines
 
 ## Gaps to Review
 
@@ -261,7 +261,7 @@ Add your review comments here
 
 ### 1. Skill: shadcn-components
 
-**Location**: `.claude/skills/shadcn-components.md`
+**Location**: `.pi/skills/shadcn-components.md`
 **Trigger**: When working with shadcn UI components
 **Source beads**: choo-abc, choo-def
 
@@ -372,10 +372,10 @@ When user indicates approval (Mode 3 option B, or explicit request):
 
 ### For Each Approved Artifact
 
-1. **Skills** (in `.claude/skills/`):
+1. **Skills** (in `.pi/skills/`):
 
-   - Create `.claude/skills/` directory if needed
-   - Write `.claude/skills/<name>.md` with proper frontmatter:
+   - Create `.pi/skills/` directory if needed
+   - Write `.pi/skills/<name>.md` with proper frontmatter:
 
      ```markdown
      ---

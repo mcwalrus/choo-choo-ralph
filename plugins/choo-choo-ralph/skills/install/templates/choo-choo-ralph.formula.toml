@@ -456,7 +456,7 @@ Review [LEARNING] comments and create/update skills.
 1. **Get orchestrator comments**: `bd comments <your-parent-id>`
 
 2. **For each [LEARNING] comment**:
-   - Search existing skills in `.claude/skills/`
+   - Search existing skills in `.pi/skills/`
    - If matching skill exists -> update that skill
    - If no match and substantial -> create new skill
    - If minor/folder-specific -> create folder CLAUDE.md

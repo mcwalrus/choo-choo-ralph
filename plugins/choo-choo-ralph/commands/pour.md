@@ -59,7 +59,7 @@ If no spec file provided or found:
 
 3. **Wait for user response** before taking any action
 4. If user chooses "Pour directly": create molecules from extracted tasks
-5. If user chooses "Create spec first": run `/choo-choo-ralph:spec` command
+5. If user chooses "Create spec first": run `/spec` command
 6. If user chooses "Cancel": stop and report cancellation
 
 ## Workflow Mode Selection

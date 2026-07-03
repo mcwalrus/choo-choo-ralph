@@ -22,7 +22,7 @@ Quick reference for operating Choo Choo Ralph across all workflow phases.
 4. **Ralph** - The loop runs autonomously until done
 5. **Harvest** - Extract learnings into skills, docs, or CLAUDE.md
 
-See `${CLAUDE_PLUGIN_ROOT}/docs/workflow.md` for the complete guide.
+See `../../../../docs/workflow.md` for the complete guide.
 
 ## Prerequisites & Safety
 
@@ -39,7 +39,7 @@ See `${CLAUDE_PLUGIN_ROOT}/docs/workflow.md` for the complete guide.
 ## Install
 
 ```bash
-/choo-choo-ralph:install
+/install
 ```
 
 Creates local copies you can customize:
@@ -58,12 +58,12 @@ Creates local copies you can customize:
 ### Generate a Spec
 
 ```bash
-/choo-choo-ralph:spec [source-file] [spec-name]
+/spec [source-file] [spec-name]
 ```
 
-- From plan file: `/choo-choo-ralph:spec plans/my-feature.md`
-- From conversation: `/choo-choo-ralph:spec` (uses context)
-- With explicit name: `/choo-choo-ralph:spec plans/feature.md auth-system`
+- From plan file: `/spec plans/my-feature.md`
+- From conversation: `/spec` (uses context)
+- With explicit name: `/spec plans/feature.md auth-system`
 
 Specs are stored at `.choo-choo-ralph/{spec-name}.spec.md`
 
@@ -93,7 +93,7 @@ Tasks use XML-like tags with a review workflow:
    ```xml
    <review>Split this into two tasks: validation and submission</review>
    ```
-2. **Run `/choo-choo-ralph:spec` again** - AI processes feedback
+2. **Run `/spec` again** - AI processes feedback
 3. **Repeat** until all `<review>` tags are empty
 
 **Common review patterns:**
@@ -102,20 +102,20 @@ Tasks use XML-like tags with a review workflow:
 - Remove: `<review>Remove - already exists in utils/</review>`
 - Combine: `<review>Merge with task-xyz, too small separately</review>`
 
-See `${CLAUDE_PLUGIN_ROOT}/docs/spec-format.md` for complete format reference.
+See `../../../../docs/spec-format.md` for complete format reference.
 
 ## Pour Phase
 
 ### Convert Spec to Beads
 
 ```bash
-/choo-choo-ralph:pour [target-tasks] [spec-file] [formula]
+/pour [target-tasks] [spec-file] [formula]
 ```
 
 Examples:
-- Auto-detect everything: `/choo-choo-ralph:pour`
-- Target 80 tasks: `/choo-choo-ralph:pour 80`
-- Specific spec and formula: `/choo-choo-ralph:pour 80 auth-system choo-choo-ralph`
+- Auto-detect everything: `/pour`
+- Target 80 tasks: `/pour 80`
+- Specific spec and formula: `/pour 80 auth-system choo-choo-ralph`
 
 ### Modes
 
@@ -133,7 +133,7 @@ bearings → implement → verify → commit
 3. Spec archived to `.choo-choo-ralph/archive/`
 4. Tasks ready for Ralph
 
-See `${CLAUDE_PLUGIN_ROOT}/docs/commands.md` for all options.
+See `../../../../docs/commands.md` for all options.
 
 ## Ralph Loop
 
@@ -255,7 +255,7 @@ bd update <bead-id> --status open   # Reopen for retry
 bd close <bead-id> --reason "Fixed manually"
 ```
 
-See `${CLAUDE_PLUGIN_ROOT}/docs/troubleshooting.md` for recovery procedures.
+See `../../../../docs/troubleshooting.md` for recovery procedures.
 
 ## Harvest Phase
 
@@ -277,7 +277,7 @@ Example comments on a completed bead:
 ### Running Harvest
 
 ```bash
-/choo-choo-ralph:harvest
+/harvest
 ```
 
 The harvest workflow:
@@ -355,8 +355,8 @@ description = """Step instructions..."""
 | `ralph-subagent-*` | Spawned as sub-agent |
 | `ralph-inline-*` | Executed by orchestrator directly |
 
-See `${CLAUDE_PLUGIN_ROOT}/docs/customization.md` for complete guide.
-See `${CLAUDE_PLUGIN_ROOT}/docs/formulas.md` for formula reference.
+See `../../../../docs/customization.md` for complete guide.
+See `../../../../docs/formulas.md` for formula reference.
 
 ## Troubleshooting
 
@@ -390,7 +390,7 @@ bd update <bead-id> --status open     # Reopen when ready
 1. Move spec from archive: `mv .choo-choo-ralph/archive/spec.md .choo-choo-ralph/`
 2. Delete existing beads (IDs in spec's `poured` array)
 3. Clear `poured: []` in frontmatter
-4. Run `/choo-choo-ralph:pour`
+4. Run `/pour`
 
 **Session recovery (mid-task crash):**
 ```bash
@@ -408,24 +408,24 @@ bd comments <bead-id>    # View task history
 bd show <root-id>        # Inspect molecule structure
 ```
 
-See `${CLAUDE_PLUGIN_ROOT}/docs/troubleshooting.md` for complete guide.
+See `../../../../docs/troubleshooting.md` for complete guide.
 
 ## Documentation
 
-- **`${CLAUDE_PLUGIN_ROOT}/docs/workflow.md`** - Complete workflow guide
-- **`${CLAUDE_PLUGIN_ROOT}/docs/spec-format.md`** - Spec file format reference
-- **`${CLAUDE_PLUGIN_ROOT}/docs/commands.md`** - All commands with examples
-- **`${CLAUDE_PLUGIN_ROOT}/docs/formulas.md`** - Formula reference and customization
-- **`${CLAUDE_PLUGIN_ROOT}/docs/customization.md`** - Customizing Ralph for your project
-- **`${CLAUDE_PLUGIN_ROOT}/docs/troubleshooting.md`** - Common issues and solutions
+- **`../../../../docs/workflow.md`** - Complete workflow guide
+- **`../../../../docs/spec-format.md`** - Spec file format reference
+- **`../../../../docs/commands.md`** - All commands with examples
+- **`../../../../docs/formulas.md`** - Formula reference and customization
+- **`../../../../docs/customization.md`** - Customizing Ralph for your project
+- **`../../../../docs/troubleshooting.md`** - Common issues and solutions
 
 ### Commands
 
 | Command | Purpose |
 |---------|---------|
-| `/choo-choo-ralph:install` | Set up Ralph in project |
-| `/choo-choo-ralph:spec` | Generate/refine spec from plan |
-| `/choo-choo-ralph:pour` | Create beads from spec |
-| `/choo-choo-ralph:harvest` | Extract learnings |
+| `/install` | Set up Ralph in project |
+| `/spec` | Generate/refine spec from plan |
+| `/pour` | Create beads from spec |
+| `/harvest` | Extract learnings |
 | `./ralph.sh` | Run Ralph loop |
 | `./ralph-once.sh` | Run single task |

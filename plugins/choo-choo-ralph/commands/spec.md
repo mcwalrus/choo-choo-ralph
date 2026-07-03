@@ -74,7 +74,7 @@ Both sub-agents should return concise summaries (not full docs) that inform spec
 With context gathered:
 
 - Accept plan from conversation context or file path (`source_file`)
-- Invoke the `/choo-choo-ralph:spec-generation` skill for format guidance (includes `<context>` section format)
+- Invoke the `/spec-generation` skill for format guidance (includes `<context>` section format)
 - **Get current date** by running `date +%Y-%m-%d` bash command for the frontmatter `created` field
 - **Include research findings** in the spec's `<context>` section
 - Generate at `.choo-choo-ralph/{spec_name}.spec.md`

@@ -1,5 +1,6 @@
 ---
-description: Install Choo Choo Ralph into the current project
+name: install
+description: Install Choo Choo Ralph into the current project. Use when the user asks to install, set up, or bootstrap Choo Choo Ralph / the Ralph autonomous coding workflow.
 ---
 
 # Install Choo Choo Ralph
@@ -11,7 +12,7 @@ Set up the Ralph autonomous coding workflow in this project.
 1. **Check beads CLI**: Run `bd --version`
    - If not installed: "Please install beads first. See: https://github.com/steveyegge/beads"
 
-2. **Check Claude CLI**: Run `claude --version`
+2. **Check pi CLI**: Run `pi --version`
    - If not installed: Warn user they'll need it to run Ralph
 
 3. **Check jq**: Run `jq --version`
@@ -25,6 +26,7 @@ Before installing, check which files already exist:
 - `./ralph.sh`
 - `./ralph-once.sh`
 - `./ralph-format.sh`
+- `./ralph-observe.sh`
 - `.beads/formulas/choo-choo-ralph.formula.toml`
 - `.beads/formulas/bug-fix.formula.toml`
 
@@ -38,19 +40,28 @@ Before installing, check which files already exist:
 
 Use Bash `cp` commands for fast file copying (NOT Read/Write tools).
 
+This skill's templates live in a `templates/` directory next to this
+SKILL.md file. Resolve that directory from this skill's location (given to
+you in context as this file's path) and use it as `$SKILL_DIR` below:
+
+```bash
+SKILL_DIR="$(dirname "<path to this SKILL.md>")"
+```
+
 1. **Copy shell scripts** to project root (if not skipped):
    ```bash
-   cp "${CLAUDE_PLUGIN_ROOT}/templates/ralph.sh" ./ralph.sh
-   cp "${CLAUDE_PLUGIN_ROOT}/templates/ralph-once.sh" ./ralph-once.sh
-   cp "${CLAUDE_PLUGIN_ROOT}/templates/ralph-format.sh" ./ralph-format.sh
-   chmod +x ralph.sh ralph-once.sh ralph-format.sh
+   cp "${SKILL_DIR}/templates/ralph.sh" ./ralph.sh
+   cp "${SKILL_DIR}/templates/ralph-once.sh" ./ralph-once.sh
+   cp "${SKILL_DIR}/templates/ralph-format.sh" ./ralph-format.sh
+   cp "${SKILL_DIR}/templates/ralph-observe.sh" ./ralph-observe.sh
+   chmod +x ralph.sh ralph-once.sh ralph-format.sh ralph-observe.sh
    ```
 
 2. **Set up formulas directory**:
    ```bash
    mkdir -p .beads/formulas
-   cp "${CLAUDE_PLUGIN_ROOT}/templates/choo-choo-ralph.formula.toml" .beads/formulas/
-   cp "${CLAUDE_PLUGIN_ROOT}/templates/bug-fix.formula.toml" .beads/formulas/
+   cp "${SKILL_DIR}/templates/choo-choo-ralph.formula.toml" .beads/formulas/
+   cp "${SKILL_DIR}/templates/bug-fix.formula.toml" .beads/formulas/
    ```
 
 3. **Create spec directory**:
@@ -73,13 +84,13 @@ Use Bash `cp` commands for fast file copying (NOT Read/Write tools).
 
 Report what was installed (and what was skipped if applicable):
 
-- Scripts: ralph.sh, ralph-once.sh, ralph-format.sh
+- Scripts: ralph.sh, ralph-once.sh, ralph-format.sh, ralph-observe.sh
 - Formulas: .beads/formulas/choo-choo-ralph.formula.toml, .beads/formulas/bug-fix.formula.toml
 - Spec directory: .choo-choo-ralph/
 
 Explain next steps:
 
-1. Use `/choo-choo-ralph:spec` to generate a spec from your plan
+1. Use `/spec` to generate a spec from your plan
 2. Review and approve features in the spec
-3. Use `/choo-choo-ralph:pour` to create beads
-4. Run `./ralph.sh` to start the autonomous loop
+3. Use `/pour` to create beads
+4. Run `./ralph.sh` to start the autonomous loop (or `./ralph-observe.sh` for human-in-the-loop mode)
